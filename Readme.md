@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Юлия Бузина](https://up.htmlacademy.ru/javascript/11/user/173657).
-* Наставник: `Неизвестно`.
+* Наставник: Филипп Шамсиев.
 
 ---
 
