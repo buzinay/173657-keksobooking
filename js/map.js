@@ -13,19 +13,19 @@ var getRandomNum = function (min, max) {
 
 //  Функция возвращает неповторяющийся случайный подмассив из элементов массива array длиной length
 var randomArray = function (array, length) {
-  var numbers = [];
-  var rez = [];
+  var nonRepeatingRandomNumbers = [];
+  var nonRepeatingArray = [];
   var i = 0;
 
   while (i < length) {
     var randomNum = getRandomNum(0, array.length - 1);
-    if (!numbers[randomNum]) {
-      numbers[randomNum] = 1;
-      rez[i] = array[randomNum];
+    if (!nonRepeatingRandomNumbers[randomNum]) {
+      nonRepeatingRandomNumbers[randomNum] = 1;
+      nonRepeatingArray[i] = array[randomNum];
       i++;
     }
   }
-  return rez;
+  return nonRepeatingArray;
 };
 
 var cardTotalNumber = 8;
@@ -56,6 +56,7 @@ for (var i = 0; i < cardTotalNumber; i++) {
     x: getRandomNum(300, 900), // случайное число, координата x метки на карте от 300 до 900,
     y: getRandomNum(100, 500) // случайное число, координата y метки на карте от 100 до 500
   };
+  cards[i].offer.address = cards[i].location.x + ', ' + cards[i].location.y;
 }
 
 var mapPin = document.querySelector('.map__pins');
@@ -84,52 +85,68 @@ mapPin.appendChild(fragment);
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
 
 // Создаем DOM элемент объявления
-var card = cards[0];
-var cardItem = mapCardTemplate.cloneNode(true);
-cardItem.querySelector('h3').textContent = card.offer.title; // Выведите заголовок объявления offer.title в заголовок h3
-cardItem.querySelector('.popup__price').textContent = card.offer.price + '\u20BD/ночь'; // Выведите цену offer.price в блок .popup__price строкой вида {{offer.price}}&#x20bd;/ночь
-var getType = function () {
-  var type = '';
-  if (card.offer.type === 'flat') {
-    type = 'Квартира';
+var renderCard = function (card) {
+  var cardItem = mapCardTemplate.cloneNode(true);
+  cardItem.querySelector('h3').textContent = card.offer.title; // Выведите заголовок объявления offer.title в заголовок h3
+  cardItem.querySelector('small').textContent = card.offer.address;// Выведите адрес offer.address в соответствующий блок
+  cardItem.querySelector('.popup__price').textContent = card.offer.price + '\u20BD/ночь'; // Выведите цену offer.price в блок .popup__price строкой вида {{offer.price}}&#x20bd;/ночь
+  var getType = function () {
+    var type = '';
+    switch (card.offer.type) {
+      case 'flat': {
+        type = 'Квартира';
+        break;
+      }
+      case 'house': {
+        type = 'Дом';
+        break;
+      }
+      case 'bungalo': {
+        type = 'Бунгало';
+        break;
+      }
+      default: {
+        type = '';
+      }
+    }
+    return type;
+  };
+
+  // В блок h4 выведите тип жилья offer.type: Квартира для flat, Бунгало для bungalo, Дом для house
+  cardItem.querySelector('h4').textContent = getType();
+  var offerRoom = card.offer.rooms === 1 ? ' комната' : ' комнаты';
+  var offerQuests = card.offer.guests === 1 ? ' гостя' : ' гостей';
+  cardItem.querySelectorAll('p')[2].textContent = card.offer.rooms + offerRoom + ' для ' + card.offer.guests + offerQuests; // Выведите количество гостей и комнат offer.rooms и offer.guests в соответствующий блок строкой вида {{offer.rooms}} для {{offer.guests}} гостей
+  cardItem.querySelectorAll('p')[3].textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout; // Время заезда и выезда offer.checkin и offer.checkout в соответствующий блок строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}
+
+  // В список .popup__features выведите все доступные удобства в квартире из массива {{offer.features}} пустыми элементами списка (<li>) с классом feature feature--{{название удобства}}
+  var featureList = cardItem.querySelector('.popup__features');
+  while (featureList.firstChild) {
+    featureList.removeChild(featureList.firstChild);
   }
-  if (card.offer.type === 'house') {
-    type = 'Дом';
+
+  for (i = 0; i < card.offer.features.length; i++) {
+    var featureListItem = document.createElement('li');
+    featureListItem.classList.add('feature', 'feature--' + card.offer.features[i]);
+    featureList.appendChild(featureListItem);
   }
-  if (card.offer.type === 'bungalo') {
-    type = 'Бунгало';
-  }
-  return type;
+
+  // В соответствующий блок выведите описание объекта недвижимости offer.description
+  cardItem.querySelectorAll('p')[4].textContent = card.offer.description;
+
+  // Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
+  cardItem.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
+
+  return cardItem;
 };
 
-// В блок h4 выведите тип жилья offer.type: Квартира для flat, Бунгало для bungalo, Дом для house
-cardItem.querySelector('h4').textContent = getType();
-var offerRoom = card.offer.rooms === 1 ? ' комната' : ' комнаты';
-var offerQuests = card.offer.guests === 1 ? ' гостя' : ' гостей';
-cardItem.querySelectorAll('p')[2].textContent = card.offer.rooms + offerRoom + ' для ' + card.offer.guests + offerQuests; // Выведите количество гостей и комнат offer.rooms и offer.guests в соответствующий блок строкой вида {{offer.rooms}} для {{offer.guests}} гостей
-cardItem.querySelectorAll('p')[3].textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout; // Время заезда и выезда offer.checkin и offer.checkout в соответствующий блок строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}
-
-// В список .popup__features выведите все доступные удобства в квартире из массива {{offer.features}} пустыми элементами списка (<li>) с классом feature feature--{{название удобства}}
-var featureList = cardItem.querySelector('.popup__features');
-while (featureList.firstChild) {
-  featureList.removeChild(featureList.firstChild);
-}
-
-for (i = 0; i < card.offer.features.length; i++) {
-  var featureListItem = document.createElement('li');
-  featureListItem.classList.add('feature', 'feature--' + card.offer.features[i]);
-  featureList.appendChild(featureListItem);
-}
-
-// В соответствующий блок выведите описание объекта недвижимости offer.description
-cardItem.querySelectorAll('p')[4].textContent = card.offer.description;
-
-// Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
-cardItem.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
-
+// Создаем фрагмент разметки с карточкой объявления
 fragment = document.createDocumentFragment();
+var cardItem = renderCard(cards[0]);
 fragment.appendChild(cardItem);
 
+
+// Находим нужное место в разметке и вставляем фрагмент
 var map = document.querySelector('.map');
 var mapCard = document.querySelector('.map__filters-container');
 map.insertBefore(fragment, mapCard);
