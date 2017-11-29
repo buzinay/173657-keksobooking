@@ -50,7 +50,28 @@ for (var i = 0; i < cardTotalNumber; i++) {
     checkout: CHECK_TIME[getRandomNum(0, CHECK_TIME.length - 1)], // строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
     features: randomArray(FEATURES, getRandomNum(1, FEATURES.length)), // массив строк случайной длины из ниже предложенных: 'wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner',
     description: '', // пустая строка,
-    photos: [] // пустой массив
+    photos: [], // пустой массив
+    getType: function () {
+      var type = '';
+      switch (this.type) {
+        case 'flat': {
+          type = 'Квартира';
+          break;
+        }
+        case 'house': {
+          type = 'Дом';
+          break;
+        }
+        case 'bungalo': {
+          type = 'Бунгало';
+          break;
+        }
+        default: {
+          type = 'Жилое помещение';
+        }
+      }
+      return type;
+    }
   };
   cards[i].location = {
     x: getRandomNum(300, 900), // случайное число, координата x метки на карте от 300 до 900,
@@ -90,30 +111,9 @@ var renderCard = function (card) {
   cardItem.querySelector('h3').textContent = card.offer.title; // Выведите заголовок объявления offer.title в заголовок h3
   cardItem.querySelector('small').textContent = card.offer.address;// Выведите адрес offer.address в соответствующий блок
   cardItem.querySelector('.popup__price').textContent = card.offer.price + '\u20BD/ночь'; // Выведите цену offer.price в блок .popup__price строкой вида {{offer.price}}&#x20bd;/ночь
-  var getType = function () {
-    var type = '';
-    switch (card.offer.type) {
-      case 'flat': {
-        type = 'Квартира';
-        break;
-      }
-      case 'house': {
-        type = 'Дом';
-        break;
-      }
-      case 'bungalo': {
-        type = 'Бунгало';
-        break;
-      }
-      default: {
-        type = '';
-      }
-    }
-    return type;
-  };
 
   // В блок h4 выведите тип жилья offer.type: Квартира для flat, Бунгало для bungalo, Дом для house
-  cardItem.querySelector('h4').textContent = getType();
+  cardItem.querySelector('h4').textContent = card.offer.getType();
   var offerRoom = card.offer.rooms === 1 ? ' комната' : ' комнаты';
   var offerQuests = card.offer.guests === 1 ? ' гостя' : ' гостей';
   cardItem.querySelectorAll('p')[2].textContent = card.offer.rooms + offerRoom + ' для ' + card.offer.guests + offerQuests; // Выведите количество гостей и комнат offer.rooms и offer.guests в соответствующий блок строкой вида {{offer.rooms}} для {{offer.guests}} гостей
