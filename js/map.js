@@ -137,15 +137,90 @@ var renderCard = function (card) {
   return cardItem;
 };
 
-// Создаем фрагмент разметки с карточкой объявления
-fragment = document.createDocumentFragment();
-var cardItem = renderCard(cards[0]);
-fragment.appendChild(cardItem);
-
-
-// Находим нужное место в разметке и вставляем фрагмент
 var map = document.querySelector('.map');
-var mapCard = document.querySelector('.map__filters-container');
-map.insertBefore(fragment, mapCard);
 
+// Генерируем  фрагмент разметки с карточкой объявления c заданным номером и вставляем в разметку
+var createPopup = function (numberOfCard) {
+// Создаем фрагмент разметки с карточкой объявления
+  fragment = document.createDocumentFragment();
+  var cardItem = renderCard(cards[numberOfCard]);
+  fragment.appendChild(cardItem);
+
+  // Находим нужное место в разметке и вставляем фрагмент
+  var mapFiltersContainer = document.querySelector('.map__filters-container');
+  map.insertBefore(fragment, mapFiltersContainer);
+};
 map.classList.remove('map--faded');
+
+// ===============================================================
+var pins = map.querySelectorAll('.map__pin');
+var hiddenPin = function () {
+  for (i = 1; i < pins.length; i++) {
+    pins[i].classList.add('hidden');
+  }
+};
+
+var showPin = function () {
+  for (i = 1; i < pins.length; i++) {
+    pins[i].classList.remove('hidden');
+  }
+};
+
+// В момент открытия, страница должна находиться в следующем состоянии: карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
+var noticeForm = document.querySelector('.notice__form');
+var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
+var popup = map.querySelector('.map__card');
+window.onload = function () {
+  map.classList.toggle('map--faded', true);
+  noticeForm.classList.toggle('notice__form--disabled', true);
+  for (i = 0; i < noticeFormFieldsets.length; i++) {
+    noticeFormFieldsets[i].setAttribute('disabled', 'disabled');
+  }
+  hiddenPin();
+};
+
+// var closePopup = function () {
+//  popup.classList.add('hidden');
+// };
+
+// После того, как на блоке map__pin--main произойдет событие mouseup, форма и карта должны активироваться:
+var mapPinMain = map.querySelector('.map__pin--main');
+mapPinMain.addEventListener('mouseup', function () {
+  map.classList.remove('map--faded'); // У карты убрать класс map--faded
+  showPin();
+  // У формы убрать класс notice__form--disabled и сделать все поля формы активными
+  noticeForm.classList.remove('notice__form--disabled');
+  for (i = 0; i < noticeFormFieldsets.length; i++) {
+    noticeFormFieldsets[i].removeAttribute('disabled');
+  }
+});
+
+var getActivePin = function () {
+  var activePinNumber;
+  for (i = 0; i < pins.length; i++) {
+    if (pins[i].classList.contains('map__pin--active')) {
+      activePinNumber = i;
+    }
+  }
+  return activePinNumber;
+};
+
+// При нажатии на любой из элементов .map__pin ему должен добавляться класс map__pin--active и должен показываться элемент .popup
+// Если до этого у другого элемента существовал класс pin--active, то у этого элемента класс нужно убрать
+map.addEventListener('click', function (evt) {
+  var target = evt.target;
+  var activePin = map.querySelector('.map__pin--active');
+  if (activePin) {
+    activePin.classList.remove('map__pin--active');
+  }
+  while (target !== map) {
+    if (target.classList.contains('map__pin') && !target.classList.contains('map__pin--main')) {
+      target.classList.add('map__pin--active');
+      var activePinNumber = getActivePin();
+      // window.console.log('Нажат пин номер ' + activePinNumber);
+      createPopup(activePinNumber - 1);
+      return;
+    }
+    target = target.parentNode;
+  }
+});
