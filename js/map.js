@@ -4,6 +4,8 @@ var CARD_TITLE = ['Большая уютная квартира', 'Малень�
 var CHECK_TIME = ['12:00', '13:00', '14:00'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var FLAT_TYPE = ['flat', 'house', 'bungalo'];
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 
 // Функция для выбора случайного числа в диапазоне от min до max
 var getRandomNum = function (min, max) {
@@ -99,25 +101,42 @@ for (i = 0; i < cardTotalNumber; i++) {
 // Вставляем фрагмент в разметку
 mapPin.appendChild(fragment);
 
+var map = document.querySelector('.map');
 // Находим шаблон объявления
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
+var cardItem = mapCardTemplate.cloneNode(true);
 
-// Создаем DOM элемент объявления
+// Генерируем  фрагмент разметки с карточкой объявления из шаблона и вставляем в разметку
+var createPopup = function () {
+// Создаем фрагмент разметки с карточкой объявления
+  fragment = document.createDocumentFragment();
+  fragment.appendChild(cardItem);
+
+  // Находим нужное место в разметке и вставляем фрагмент
+  var mapFiltersContainer = document.querySelector('.map__filters-container');
+  map.insertBefore(fragment, mapFiltersContainer);
+};
+map.classList.remove('map--faded');
+
+createPopup();
+
+var popup = map.querySelector('.map__card');
+
+// Заполняем DOM элемент объявления
 var renderCard = function (card) {
-  var cardItem = mapCardTemplate.cloneNode(true);
-  cardItem.querySelector('h3').textContent = card.offer.title; // Выведите заголовок объявления offer.title в заголовок h3
-  cardItem.querySelector('small').textContent = card.offer.address;// Выведите адрес offer.address в соответствующий блок
-  cardItem.querySelector('.popup__price').textContent = card.offer.price + '\u20BD/ночь'; // Выведите цену offer.price в блок .popup__price строкой вида {{offer.price}}&#x20bd;/ночь
+  popup.querySelector('h3').textContent = card.offer.title; // Выведите заголовок объявления offer.title в заголовок h3
+  popup.querySelector('small').textContent = card.offer.address;// Выведите адрес offer.address в соответствующий блок
+  popup.querySelector('.popup__price').textContent = card.offer.price + '\u20BD/ночь'; // Выведите цену offer.price в блок .popup__price строкой вида {{offer.price}}&#x20bd;/ночь
 
   // В блок h4 выведите тип жилья offer.type: Квартира для flat, Бунгало для bungalo, Дом для house
-  cardItem.querySelector('h4').textContent = getType(card);
+  popup.querySelector('h4').textContent = getType(card);
   var offerRoom = card.offer.rooms === 1 ? ' комната' : ' комнаты';
   var offerQuests = card.offer.guests === 1 ? ' гостя' : ' гостей';
-  cardItem.querySelectorAll('p')[2].textContent = card.offer.rooms + offerRoom + ' для ' + card.offer.guests + offerQuests; // Выведите количество гостей и комнат offer.rooms и offer.guests в соответствующий блок строкой вида {{offer.rooms}} для {{offer.guests}} гостей
-  cardItem.querySelectorAll('p')[3].textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout; // Время заезда и выезда offer.checkin и offer.checkout в соответствующий блок строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}
+  popup.querySelectorAll('p')[2].textContent = card.offer.rooms + offerRoom + ' для ' + card.offer.guests + offerQuests; // Выведите количество гостей и комнат offer.rooms и offer.guests в соответствующий блок строкой вида {{offer.rooms}} для {{offer.guests}} гостей
+  popup.querySelectorAll('p')[3].textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout; // Время заезда и выезда offer.checkin и offer.checkout в соответствующий блок строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}
 
   // В список .popup__features выведите все доступные удобства в квартире из массива {{offer.features}} пустыми элементами списка (<li>) с классом feature feature--{{название удобства}}
-  var featureList = cardItem.querySelector('.popup__features');
+  var featureList = popup.querySelector('.popup__features');
   while (featureList.firstChild) {
     featureList.removeChild(featureList.firstChild);
   }
@@ -129,28 +148,12 @@ var renderCard = function (card) {
   }
 
   // В соответствующий блок выведите описание объекта недвижимости offer.description
-  cardItem.querySelectorAll('p')[4].textContent = card.offer.description;
+  popup.querySelectorAll('p')[4].textContent = card.offer.description;
 
   // Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
-  cardItem.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
-
-  return cardItem;
+  popup.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
 };
 
-var map = document.querySelector('.map');
-
-// Генерируем  фрагмент разметки с карточкой объявления c заданным номером и вставляем в разметку
-var createPopup = function (numberOfCard) {
-// Создаем фрагмент разметки с карточкой объявления
-  fragment = document.createDocumentFragment();
-  var cardItem = renderCard(cards[numberOfCard]);
-  fragment.appendChild(cardItem);
-
-  // Находим нужное место в разметке и вставляем фрагмент
-  var mapFiltersContainer = document.querySelector('.map__filters-container');
-  map.insertBefore(fragment, mapFiltersContainer);
-};
-map.classList.remove('map--faded');
 
 // ===============================================================
 var pins = map.querySelectorAll('.map__pin');
@@ -169,7 +172,7 @@ var showPin = function () {
 // В момент открытия, страница должна находиться в следующем состоянии: карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
 var noticeForm = document.querySelector('.notice__form');
 var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
-var popup = map.querySelector('.map__card');
+
 window.onload = function () {
   map.classList.toggle('map--faded', true);
   noticeForm.classList.toggle('notice__form--disabled', true);
@@ -177,11 +180,8 @@ window.onload = function () {
     noticeFormFieldsets[i].setAttribute('disabled', 'disabled');
   }
   hiddenPin();
+  closePopup();
 };
-
-// var closePopup = function () {
-//  popup.classList.add('hidden');
-// };
 
 // После того, как на блоке map__pin--main произойдет событие mouseup, форма и карта должны активироваться:
 var mapPinMain = map.querySelector('.map__pin--main');
@@ -218,9 +218,47 @@ map.addEventListener('click', function (evt) {
       target.classList.add('map__pin--active');
       var activePinNumber = getActivePin();
       // window.console.log('Нажат пин номер ' + activePinNumber);
-      createPopup(activePinNumber - 1);
+      renderCard(cards[activePinNumber - 1]);
+      openPopup();
       return;
     }
     target = target.parentNode;
   }
 });
+
+// Закрыть карточку
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
+  }
+};
+
+var closePopup = function () {
+  popup.classList.add('hidden');
+  document.removeEventListener('keydown', onPopupEscPress);
+};
+
+// Открыть карточку
+var openPopup = function () {
+  popup.classList.remove('hidden');
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+var popupClose = popup.querySelector('.popup__close');
+popupClose.addEventListener('click', function () {
+  closePopup();
+});
+
+popupClose.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closePopup();
+  }
+});
+
+for (i = 1; i < pins.length; i++) {
+  pins[i].addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      openPopup();
+    }
+  });
+}
