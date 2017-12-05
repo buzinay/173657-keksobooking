@@ -244,6 +244,7 @@ var openPopup = function () {
   document.addEventListener('keydown', onPopupEscPress);
 };
 
+// Закрыть карточку
 var popupClose = popup.querySelector('.popup__close');
 popupClose.addEventListener('click', function () {
   closePopup();
