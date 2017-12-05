@@ -5,7 +5,6 @@ var CHECK_TIME = ['12:00', '13:00', '14:00'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var FLAT_TYPE = ['flat', 'house', 'bungalo'];
 var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
 
 // Функция для выбора случайного числа в диапазоне от min до max
 var getRandomNum = function (min, max) {
@@ -85,6 +84,7 @@ var mapPin = document.querySelector('.map__pins');
 var fragment = document.createDocumentFragment();
 for (i = 0; i < cardTotalNumber; i++) {
   var button = document.createElement('button');
+  button.setAttribute('data-number', +i);
   var img = document.createElement('img');
   img.setAttribute('src', cards[i].author.avatar);
   img.setAttribute('width', '40');
@@ -156,16 +156,30 @@ var renderCard = function (card) {
 
 
 // ===============================================================
-var pins = map.querySelectorAll('.map__pin');
-var hiddenPin = function () {
-  for (i = 1; i < pins.length; i++) {
-    pins[i].classList.add('hidden');
+var switchHidden = function (elem, flag) {
+  if (elem.length) {
+    for (i = 0; i < elem.length; i++) {
+      if (flag) {
+        elem[i].classList.add('hidden');
+      } else {
+        elem[i].classList.remove('hidden');
+      }
+    }
+  } else {
+    if (flag) {
+      elem.classList.add('hidden');
+    } else {
+      elem.classList.remove('hidden');
+    }
   }
 };
 
-var showPin = function () {
-  for (i = 1; i < pins.length; i++) {
-    pins[i].classList.remove('hidden');
+var pins = map.querySelectorAll('[data-number]');
+
+var removeClassActive = function () {
+  var activePin = map.querySelector('.map__pin--active');
+  if (activePin) {
+    activePin.classList.remove('map__pin--active');
   }
 };
 
@@ -177,9 +191,9 @@ window.onload = function () {
   map.classList.toggle('map--faded', true);
   noticeForm.classList.toggle('notice__form--disabled', true);
   for (i = 0; i < noticeFormFieldsets.length; i++) {
-    noticeFormFieldsets[i].setAttribute('disabled', 'disabled');
+    noticeFormFieldsets[i].setAttribute('disabled', true);
   }
-  hiddenPin();
+  switchHidden(pins, true);
   closePopup();
 };
 
@@ -187,7 +201,7 @@ window.onload = function () {
 var mapPinMain = map.querySelector('.map__pin--main');
 mapPinMain.addEventListener('mouseup', function () {
   map.classList.remove('map--faded'); // У карты убрать класс map--faded
-  showPin();
+  switchHidden(pins);
   // У формы убрать класс notice__form--disabled и сделать все поля формы активными
   noticeForm.classList.remove('notice__form--disabled');
   for (i = 0; i < noticeFormFieldsets.length; i++) {
@@ -195,30 +209,17 @@ mapPinMain.addEventListener('mouseup', function () {
   }
 });
 
-var getActivePin = function () {
-  var activePinNumber;
-  for (i = 0; i < pins.length; i++) {
-    if (pins[i].classList.contains('map__pin--active')) {
-      activePinNumber = i;
-    }
-  }
-  return activePinNumber;
-};
-
 // При нажатии на любой из элементов .map__pin ему должен добавляться класс map__pin--active и должен показываться элемент .popup
 // Если до этого у другого элемента существовал класс pin--active, то у этого элемента класс нужно убрать
+
 map.addEventListener('click', function (evt) {
   var target = evt.target;
-  var activePin = map.querySelector('.map__pin--active');
-  if (activePin) {
-    activePin.classList.remove('map__pin--active');
-  }
+  removeClassActive();
   while (target !== map) {
     if (target.classList.contains('map__pin') && !target.classList.contains('map__pin--main')) {
       target.classList.add('map__pin--active');
-      var activePinNumber = getActivePin();
-      // window.console.log('Нажат пин номер ' + activePinNumber);
-      renderCard(cards[activePinNumber - 1]);
+      var activePinNumber = target.getAttribute('data-number');
+      renderCard(cards[activePinNumber]);
       openPopup();
       return;
     }
@@ -229,18 +230,21 @@ map.addEventListener('click', function (evt) {
 // Закрыть карточку
 var onPopupEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
+    removeClassActive();
     closePopup();
   }
 };
 
 var closePopup = function () {
-  popup.classList.add('hidden');
+  switchHidden(popup, true);
+  // popup.classList.add('hidden');
   document.removeEventListener('keydown', onPopupEscPress);
 };
 
 // Открыть карточку
 var openPopup = function () {
-  popup.classList.remove('hidden');
+  switchHidden(popup);
+  // popup.classList.remove('hidden');
   document.addEventListener('keydown', onPopupEscPress);
 };
 
@@ -249,17 +253,3 @@ var popupClose = popup.querySelector('.popup__close');
 popupClose.addEventListener('click', function () {
   closePopup();
 });
-
-popupClose.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === ENTER_KEYCODE) {
-    closePopup();
-  }
-});
-
-for (i = 1; i < pins.length; i++) {
-  pins[i].addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      openPopup();
-    }
-  });
-}
