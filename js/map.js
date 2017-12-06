@@ -4,6 +4,7 @@ var CARD_TITLE = ['Большая уютная квартира', 'Малень�
 var CHECK_TIME = ['12:00', '13:00', '14:00'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var FLAT_TYPE = ['flat', 'house', 'bungalo'];
+var ESC_KEYCODE = 27;
 
 // Функция для выбора случайного числа в диапазоне от min до max
 var getRandomNum = function (min, max) {
@@ -83,6 +84,7 @@ var mapPin = document.querySelector('.map__pins');
 var fragment = document.createDocumentFragment();
 for (i = 0; i < cardTotalNumber; i++) {
   var button = document.createElement('button');
+  button.setAttribute('data-number', +i);
   var img = document.createElement('img');
   img.setAttribute('src', cards[i].author.avatar);
   img.setAttribute('width', '40');
@@ -99,25 +101,42 @@ for (i = 0; i < cardTotalNumber; i++) {
 // Вставляем фрагмент в разметку
 mapPin.appendChild(fragment);
 
+var map = document.querySelector('.map');
 // Находим шаблон объявления
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
+var cardItem = mapCardTemplate.cloneNode(true);
 
-// Создаем DOM элемент объявления
+// Генерируем  фрагмент разметки с карточкой объявления из шаблона и вставляем в разметку
+var createPopup = function () {
+// Создаем фрагмент разметки с карточкой объявления
+  fragment = document.createDocumentFragment();
+  fragment.appendChild(cardItem);
+
+  // Находим нужное место в разметке и вставляем фрагмент
+  var mapFiltersContainer = document.querySelector('.map__filters-container');
+  map.insertBefore(fragment, mapFiltersContainer);
+};
+map.classList.remove('map--faded');
+
+createPopup();
+
+var popup = map.querySelector('.map__card');
+
+// Заполняем DOM элемент объявления
 var renderCard = function (card) {
-  var cardItem = mapCardTemplate.cloneNode(true);
-  cardItem.querySelector('h3').textContent = card.offer.title; // Выведите заголовок объявления offer.title в заголовок h3
-  cardItem.querySelector('small').textContent = card.offer.address;// Выведите адрес offer.address в соответствующий блок
-  cardItem.querySelector('.popup__price').textContent = card.offer.price + '\u20BD/ночь'; // Выведите цену offer.price в блок .popup__price строкой вида {{offer.price}}&#x20bd;/ночь
+  popup.querySelector('h3').textContent = card.offer.title; // Выведите заголовок объявления offer.title в заголовок h3
+  popup.querySelector('small').textContent = card.offer.address;// Выведите адрес offer.address в соответствующий блок
+  popup.querySelector('.popup__price').textContent = card.offer.price + '\u20BD/ночь'; // Выведите цену offer.price в блок .popup__price строкой вида {{offer.price}}&#x20bd;/ночь
 
   // В блок h4 выведите тип жилья offer.type: Квартира для flat, Бунгало для bungalo, Дом для house
-  cardItem.querySelector('h4').textContent = getType(card);
+  popup.querySelector('h4').textContent = getType(card);
   var offerRoom = card.offer.rooms === 1 ? ' комната' : ' комнаты';
   var offerQuests = card.offer.guests === 1 ? ' гостя' : ' гостей';
-  cardItem.querySelectorAll('p')[2].textContent = card.offer.rooms + offerRoom + ' для ' + card.offer.guests + offerQuests; // Выведите количество гостей и комнат offer.rooms и offer.guests в соответствующий блок строкой вида {{offer.rooms}} для {{offer.guests}} гостей
-  cardItem.querySelectorAll('p')[3].textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout; // Время заезда и выезда offer.checkin и offer.checkout в соответствующий блок строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}
+  popup.querySelectorAll('p')[2].textContent = card.offer.rooms + offerRoom + ' для ' + card.offer.guests + offerQuests; // Выведите количество гостей и комнат offer.rooms и offer.guests в соответствующий блок строкой вида {{offer.rooms}} для {{offer.guests}} гостей
+  popup.querySelectorAll('p')[3].textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout; // Время заезда и выезда offer.checkin и offer.checkout в соответствующий блок строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}
 
   // В список .popup__features выведите все доступные удобства в квартире из массива {{offer.features}} пустыми элементами списка (<li>) с классом feature feature--{{название удобства}}
-  var featureList = cardItem.querySelector('.popup__features');
+  var featureList = popup.querySelector('.popup__features');
   while (featureList.firstChild) {
     featureList.removeChild(featureList.firstChild);
   }
@@ -129,23 +148,108 @@ var renderCard = function (card) {
   }
 
   // В соответствующий блок выведите описание объекта недвижимости offer.description
-  cardItem.querySelectorAll('p')[4].textContent = card.offer.description;
+  popup.querySelectorAll('p')[4].textContent = card.offer.description;
 
   // Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
-  cardItem.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
-
-  return cardItem;
+  popup.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
 };
 
-// Создаем фрагмент разметки с карточкой объявления
-fragment = document.createDocumentFragment();
-var cardItem = renderCard(cards[0]);
-fragment.appendChild(cardItem);
 
+// ===============================================================
+var switchHidden = function (elem, flag) {
+  if (elem.length) {
+    for (i = 0; i < elem.length; i++) {
+      if (flag) {
+        elem[i].classList.add('hidden');
+      } else {
+        elem[i].classList.remove('hidden');
+      }
+    }
+  } else {
+    if (flag) {
+      elem.classList.add('hidden');
+    } else {
+      elem.classList.remove('hidden');
+    }
+  }
+};
 
-// Находим нужное место в разметке и вставляем фрагмент
-var map = document.querySelector('.map');
-var mapCard = document.querySelector('.map__filters-container');
-map.insertBefore(fragment, mapCard);
+var pins = map.querySelectorAll('[data-number]');
 
-map.classList.remove('map--faded');
+var removeClassActive = function () {
+  var activePin = map.querySelector('.map__pin--active');
+  if (activePin) {
+    activePin.classList.remove('map__pin--active');
+  }
+};
+
+// В момент открытия, страница должна находиться в следующем состоянии: карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
+var noticeForm = document.querySelector('.notice__form');
+var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
+
+window.onload = function () {
+  map.classList.toggle('map--faded', true);
+  noticeForm.classList.toggle('notice__form--disabled', true);
+  for (i = 0; i < noticeFormFieldsets.length; i++) {
+    noticeFormFieldsets[i].setAttribute('disabled', true);
+  }
+  switchHidden(pins, true);
+  closePopup();
+};
+
+// После того, как на блоке map__pin--main произойдет событие mouseup, форма и карта должны активироваться:
+var mapPinMain = map.querySelector('.map__pin--main');
+mapPinMain.addEventListener('mouseup', function () {
+  map.classList.remove('map--faded'); // У карты убрать класс map--faded
+  switchHidden(pins);
+  // У формы убрать класс notice__form--disabled и сделать все поля формы активными
+  noticeForm.classList.remove('notice__form--disabled');
+  for (i = 0; i < noticeFormFieldsets.length; i++) {
+    noticeFormFieldsets[i].removeAttribute('disabled');
+  }
+});
+
+// При нажатии на любой из элементов .map__pin ему должен добавляться класс map__pin--active и должен показываться элемент .popup
+// Если до этого у другого элемента существовал класс pin--active, то у этого элемента класс нужно убрать
+
+map.addEventListener('click', function (evt) {
+  var target = evt.target;
+  removeClassActive();
+  while (target !== map) {
+    if (target.classList.contains('map__pin') && !target.classList.contains('map__pin--main')) {
+      target.classList.add('map__pin--active');
+      var activePinNumber = target.getAttribute('data-number');
+      renderCard(cards[activePinNumber]);
+      openPopup();
+      return;
+    }
+    target = target.parentNode;
+  }
+});
+
+// Закрыть карточку
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    removeClassActive();
+    closePopup();
+  }
+};
+
+var closePopup = function () {
+  switchHidden(popup, true);
+  // popup.classList.add('hidden');
+  document.removeEventListener('keydown', onPopupEscPress);
+};
+
+// Открыть карточку
+var openPopup = function () {
+  switchHidden(popup);
+  // popup.classList.remove('hidden');
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+// Закрыть карточку
+var popupClose = popup.querySelector('.popup__close');
+popupClose.addEventListener('click', function () {
+  closePopup();
+});
