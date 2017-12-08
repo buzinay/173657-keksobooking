@@ -191,8 +191,10 @@ window.onload = function () {
   map.classList.toggle('map--faded', true);
   noticeForm.classList.toggle('notice__form--disabled', true);
   for (i = 0; i < noticeFormFieldsets.length; i++) {
-    noticeFormFieldsets[i].setAttribute('disabled', true);
+    noticeFormFieldsets[i].setAttribute('disabled', 'disabled');
   }
+  setCapacity(noticeRoomNumber.options[noticeRoomNumber.options.selectedIndex].value);
+  noticePrice.setAttribute('min', getMinPrice(noticeType.options[noticeType.options.selectedIndex].value));
   switchHidden(pins, true);
   closePopup();
 };
@@ -252,4 +254,131 @@ var openPopup = function () {
 var popupClose = popup.querySelector('.popup__close');
 popupClose.addEventListener('click', function () {
   closePopup();
+});
+
+// ====Валидация формы============================================
+
+var noticeTitle = noticeForm.querySelector('#title');
+
+noticeTitle.addEventListener('invalid', function () {
+  if (noticeTitle.validity.tooShort) {
+    noticeTitle.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
+  } else if (noticeTitle.validity.tooLong) {
+    noticeTitle.setCustomValidity('Заголовок не должен превышать 100 символов');
+  } else if (noticeTitle.validity.valueMissing) {
+    noticeTitle.setCustomValidity('Пожалуйста, заполните это поле');
+  } else {
+    noticeTitle.setCustomValidity('');
+  }
+});
+
+
+// Синхронизация время выезда со временем въезда
+
+var noticeTimeIn = noticeForm.querySelector('#timein');
+var noticeTimeOut = noticeForm.querySelector('#timeout');
+
+noticeTimeIn.addEventListener('change', function () {
+  var index = noticeTimeIn.options.selectedIndex;
+  noticeTimeOut.options[index].selected = true;
+});
+
+noticeTimeOut.addEventListener('change', function () {
+  var index = noticeTimeOut.options.selectedIndex;
+  noticeTimeIn.options[index].selected = true;
+});
+
+// Синхронизация минимальной цены в зависимости от типа жилья
+
+var noticeType = noticeForm.querySelector('#type');
+var noticePrice = noticeForm.querySelector('#price');
+
+// «Лачуга» — минимальная цена 0
+// «Квартира» — минимальная цена 1000
+// «Дом» — минимальная цена 5000
+// «Дворец» — минимальная цена 10000
+var getMinPrice = function (target) {
+  var minPrice;
+  switch (target) {
+    case 'flat': {
+      minPrice = 1000;
+      break;
+    }
+    case 'house': {
+      minPrice = 5000;
+      break;
+    }
+    case 'palace': {
+      minPrice = 10000;
+      break;
+    }
+    default: {
+      minPrice = 0;
+      break;
+    }
+  }
+  return minPrice;
+};
+
+noticeType.addEventListener('change', function (evt) {
+  var target = evt.target;
+  noticePrice.setAttribute('min', getMinPrice(target.value));
+});
+
+var checkPriceValidity = function () {
+  if (noticePrice.validity.rangeUnderflow) {
+    noticePrice.setCustomValidity('Минимальныя цена должна быть не ниже ' + noticePrice.getAttribute('min'));
+  } else {
+    noticePrice.setCustomValidity('');
+  }
+};
+
+noticePrice.addEventListener('invalid', function () {
+  checkPriceValidity();
+});
+
+
+// Количество комнат связано с количеством гостей:
+// 1 комната — «для одного гостя»
+// 2 комнаты — «для 2-х или 1-го гостя»
+// 3 комнаты — «для 2-х, 1-го или 3-х гостей»
+// 100 комнат — «не для гостей»
+// noticeTimeIn.options[index].selected = true;
+
+var noticeRoomNumber = noticeForm.querySelector('#room_number');
+var noticeCapacity = noticeForm.querySelector('#capacity');
+
+var setCapacity = function (val) {
+  for (i = 0; i < noticeCapacity.options.length; i++) {
+    noticeCapacity.options[i].setAttribute('disabled', 'disabled');
+  }
+  switch (val) {
+    case '1': {
+      noticeCapacity.options[2].selected = true;
+      noticeCapacity.options[2].removeAttribute('disabled');
+      break;
+    }
+    case '2': {
+      noticeCapacity.options[1].selected = true;
+      noticeCapacity.options[1].removeAttribute('disabled');
+      noticeCapacity.options[2].removeAttribute('disabled');
+      break;
+    }
+    case '3': {
+      noticeCapacity.options[0].selected = true;
+      noticeCapacity.options[1].removeAttribute('disabled');
+      noticeCapacity.options[2].removeAttribute('disabled');
+      break;
+    }
+    default: {
+      noticeCapacity.options[3].selected = true;
+      noticeCapacity.options[3].removeAttribute('disabled');
+      break;
+    }
+  }
+};
+
+noticeRoomNumber.addEventListener('change', function (evt) {
+  var target = evt.target;
+  setCapacity(target.value);
 });
