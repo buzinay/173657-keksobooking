@@ -259,19 +259,54 @@ popupClose.addEventListener('click', function () {
 // ====Валидация формы============================================
 
 var noticeTitle = noticeForm.querySelector('#title');
+var minTitle = 30;
+var maxTitle = 100;
 
-noticeTitle.addEventListener('invalid', function () {
-  if (noticeTitle.validity.tooShort) {
-    noticeTitle.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
-  } else if (noticeTitle.validity.tooLong) {
-    noticeTitle.setCustomValidity('Заголовок не должен превышать 100 символов');
-  } else if (noticeTitle.validity.valueMissing) {
-    noticeTitle.setCustomValidity('Пожалуйста, заполните это поле');
-  } else {
-    noticeTitle.setCustomValidity('');
-  }
+noticeTitle.addEventListener('invalid', function (evt) {
+  var target = evt.target;
+  checkNoticeTitle(target);
 });
 
+noticeTitle.addEventListener('keydown', function (evt) {
+  var target = evt.target;
+  checkNoticeTitle(target);
+});
+
+var checkNoticeTitle = function (input) {
+  if (input.validity.valueMissing || input.value === '') {
+    input.setCustomValidity('Пожалуйста, заполните это поле');
+    setErrorStyle(input);
+  } else if (input.validity.tooLong || input.length > maxTitle) {
+    input.setCustomValidity('Заголовок не должен превышать 100 символов');
+    setErrorStyle(input);
+  } else if (input.validity.tooShort || input.value.length < minTitle) {
+    input.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
+    setErrorStyle(input);
+  } else {
+    input.setCustomValidity('');
+    input.removeAttribute('style');
+  }
+};
+
+var setErrorStyle = function (elem) {
+  elem.setAttribute('style', 'border:3px solid red');
+};
+
+var noticeAddress = noticeForm.querySelector('#address');
+var checkAddressValidity = function (input) {
+  if (input.validity.valueMissing || input.value === '') {
+    input.setCustomValidity('Пожалуйста, заполните это поле');
+    setErrorStyle(input);
+  } else {
+    input.setCustomValidity('');
+    input.removeAttribute('style');
+  }
+};
+
+noticeAddress.addEventListener('invalid', function (evt) {
+  var target = evt.target;
+  checkAddressValidity(target);
+});
 
 // Синхронизация время выезда со временем въезда
 
@@ -325,16 +360,36 @@ noticeType.addEventListener('change', function (evt) {
   noticePrice.setAttribute('min', getMinPrice(target.value));
 });
 
-var checkPriceValidity = function () {
-  if (noticePrice.validity.rangeUnderflow) {
-    noticePrice.setCustomValidity('Минимальныя цена должна быть не ниже ' + noticePrice.getAttribute('min'));
+var maxPrice = 1000000;
+
+var checkPriceValidity = function (input) {
+  var currentMinPrice = getMinPrice(noticeType.value);
+  if (input.validity.valueMissing || input.value === '') {
+    // input.setCustomValidity('');
+    input.setCustomValidity('Пожалуйста, заполните это поле');
+    setErrorStyle(input);
+  } else if (input.validity.rangeUnderflow || input.value < currentMinPrice) {
+    // input.setCustomValidity('');
+    input.setCustomValidity('Минимальныя цена должна быть не ниже ' + currentMinPrice);
+    setErrorStyle(input);
+  } else if (input.validity.rangeOverflow || input.value > maxPrice) {
+    // input.setCustomValidity('');
+    input.setCustomValidity('Максимальная цена должна быть ниже 1000000 ');
+    setErrorStyle(input);
   } else {
-    noticePrice.setCustomValidity('');
+    input.setCustomValidity('');
+    input.removeAttribute('style');
   }
 };
 
-noticePrice.addEventListener('invalid', function () {
-  checkPriceValidity();
+noticePrice.addEventListener('invalid', function (evt) {
+  var target = evt.target;
+  checkPriceValidity(target);
+});
+
+noticePrice.addEventListener('change', function (evt) {
+  var target = evt.target;
+  checkPriceValidity(target);
 });
 
 
@@ -350,29 +405,30 @@ var noticeCapacity = noticeForm.querySelector('#capacity');
 
 var setCapacity = function (val) {
   for (i = 0; i < noticeCapacity.options.length; i++) {
-    noticeCapacity.options[i].setAttribute('disabled', 'disabled');
+    noticeCapacity.options[i].disabled = true;
   }
   switch (val) {
     case '1': {
       noticeCapacity.options[2].selected = true;
-      noticeCapacity.options[2].removeAttribute('disabled');
+      noticeCapacity.options[2].disabled = false;
       break;
     }
     case '2': {
       noticeCapacity.options[1].selected = true;
-      noticeCapacity.options[1].removeAttribute('disabled');
-      noticeCapacity.options[2].removeAttribute('disabled');
+      noticeCapacity.options[1].disabled = false;
+      noticeCapacity.options[2].disabled = false;
       break;
     }
     case '3': {
       noticeCapacity.options[0].selected = true;
-      noticeCapacity.options[1].removeAttribute('disabled');
-      noticeCapacity.options[2].removeAttribute('disabled');
+      noticeCapacity.options[0].disabled = false;
+      noticeCapacity.options[1].disabled = false;
+      noticeCapacity.options[2].disabled = false;
       break;
     }
     default: {
       noticeCapacity.options[3].selected = true;
-      noticeCapacity.options[3].removeAttribute('disabled');
+      noticeCapacity.options[3].disabled = false;
       break;
     }
   }
@@ -381,4 +437,9 @@ var setCapacity = function (val) {
 noticeRoomNumber.addEventListener('change', function (evt) {
   var target = evt.target;
   setCapacity(target.value);
+});
+
+var noticeFormSubmit = noticeForm.querySelector('.form__submit');
+noticeFormSubmit.addEventListener('submit', function (event) {
+  event.preventDefault();
 });
