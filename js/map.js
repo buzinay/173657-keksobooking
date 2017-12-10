@@ -272,6 +272,7 @@ noticeTitle.addEventListener('keydown', function (evt) {
   checkNoticeTitle(target);
 });
 
+
 var checkNoticeTitle = function (input) {
   if (input.validity.valueMissing || input.value === '') {
     input.setCustomValidity('Пожалуйста, заполните это поле');
@@ -439,7 +440,24 @@ noticeRoomNumber.addEventListener('change', function (evt) {
   setCapacity(target.value);
 });
 
-var noticeFormSubmit = noticeForm.querySelector('.form__submit');
-noticeFormSubmit.addEventListener('submit', function (event) {
-  event.preventDefault();
+var requiredFields = ['title', 'address', 'price'];
+var noticeFormFields = noticeForm.querySelectorAll('input:not([type="submit"])');
+
+var checkRequiredFields = function () {
+  var error = false;
+  for (i = 0; i < requiredFields.length; i++) {
+    for (var j = 0; j < noticeFormFields.length; j++) {
+      if (noticeFormFields[j].name === requiredFields[i] && noticeFormFields[j].value === '') {
+        setErrorStyle(noticeFormFields[j]);
+        error = true;
+      }
+    }
+  }
+  return error;
+};
+
+noticeForm.addEventListener('submit', function (event) {
+  if (checkRequiredFields()) {
+    event.preventDefault();
+  }
 });
