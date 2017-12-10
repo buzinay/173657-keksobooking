@@ -272,7 +272,6 @@ noticeTitle.addEventListener('keydown', function (evt) {
   checkNoticeTitle(target);
 });
 
-
 var checkNoticeTitle = function (input) {
   if (input.validity.valueMissing || input.value === '') {
     input.setCustomValidity('Пожалуйста, заполните это поле');
@@ -284,13 +283,17 @@ var checkNoticeTitle = function (input) {
     input.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
     setErrorStyle(input);
   } else {
-    input.setCustomValidity('');
-    input.removeAttribute('style');
+    removeErrorStyle(input);
   }
 };
 
 var setErrorStyle = function (elem) {
   elem.setAttribute('style', 'border:3px solid red');
+};
+
+var removeErrorStyle = function (elem) {
+  elem.setCustomValidity('');
+  elem.removeAttribute('style');
 };
 
 var noticeAddress = noticeForm.querySelector('#address');
@@ -299,8 +302,7 @@ var checkAddressValidity = function (input) {
     input.setCustomValidity('Пожалуйста, заполните это поле');
     setErrorStyle(input);
   } else {
-    input.setCustomValidity('');
-    input.removeAttribute('style');
+    removeErrorStyle(input);
   }
 };
 
@@ -366,20 +368,16 @@ var maxPrice = 1000000;
 var checkPriceValidity = function (input) {
   var currentMinPrice = getMinPrice(noticeType.value);
   if (input.validity.valueMissing || input.value === '') {
-    // input.setCustomValidity('');
     input.setCustomValidity('Пожалуйста, заполните это поле');
     setErrorStyle(input);
   } else if (input.validity.rangeUnderflow || input.value < currentMinPrice) {
-    // input.setCustomValidity('');
     input.setCustomValidity('Минимальныя цена должна быть не ниже ' + currentMinPrice);
     setErrorStyle(input);
   } else if (input.validity.rangeOverflow || input.value > maxPrice) {
-    // input.setCustomValidity('');
     input.setCustomValidity('Максимальная цена должна быть ниже 1000000 ');
     setErrorStyle(input);
   } else {
-    input.setCustomValidity('');
-    input.removeAttribute('style');
+    removeErrorStyle(input);
   }
 };
 
@@ -399,7 +397,6 @@ noticePrice.addEventListener('change', function (evt) {
 // 2 комнаты — «для 2-х или 1-го гостя»
 // 3 комнаты — «для 2-х, 1-го или 3-х гостей»
 // 100 комнат — «не для гостей»
-// noticeTimeIn.options[index].selected = true;
 
 var noticeRoomNumber = noticeForm.querySelector('#room_number');
 var noticeCapacity = noticeForm.querySelector('#capacity');
