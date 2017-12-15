@@ -1,9 +1,7 @@
 'use strict';
 
 (function () {
-  var ESC_KEYCODE = 27;
-
-  window.util = {
+  window.utils = {
     // Функция для выбора случайного числа в диапазоне от min до max
     getRandomNum: function (min, max) {
       var randomNum = Math.round(Math.random() * (max - min)) + min;
@@ -45,6 +43,7 @@
     },
 
     isEscEvent: function (evt, action) {
+      var ESC_KEYCODE = 27;
       if (evt.keyCode === ESC_KEYCODE) {
         action();
       }

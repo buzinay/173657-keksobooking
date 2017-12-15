@@ -20,27 +20,23 @@
     return type;
   };
 
-  var map = document.querySelector('.map');
-  // Находим шаблон объявления
-  var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
-  var cardItem = mapCardTemplate.cloneNode(true);
+  // var map = document.querySelector('.map');
 
-  // Генерируем  фрагмент разметки с карточкой объявления из шаблона и вставляем в разметку
-  (function () {
-  // Создаем фрагмент разметки с карточкой объявления
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(cardItem);
-
-    // Находим нужное место в разметке и вставляем фрагмент
-    var mapFiltersContainer = document.querySelector('.map__filters-container');
-    map.insertBefore(fragment, mapFiltersContainer);
-  })();
-
-  var popup = map.querySelector('.map__card');
-
+  // var popup = document.querySelector('.map__card');
   // Заполняем DOM элемент объявления
   window.card = {
-    renderCard: function (card) {
+    createPopupFragment: function () {
+      // Находим шаблон объявления
+      var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
+      var cardItem = mapCardTemplate.cloneNode(true);
+
+      // Генерируем  фрагмент разметки с карточкой объявления из шаблона и вставляем в разметку
+      // Создаем фрагмент разметки с карточкой объявления
+      var fragment = document.createDocumentFragment();
+      fragment.appendChild(cardItem);
+      return fragment;
+    },
+    renderCard: function (card, popup) {
       popup.querySelector('h3').textContent = card.offer.title; // Выведите заголовок объявления offer.title в заголовок h3
       popup.querySelector('small').textContent = card.offer.address;// Выведите адрес offer.address в соответствующий блок
       popup.querySelector('.popup__price').textContent = card.offer.price + '\u20BD/ночь'; // Выведите цену offer.price в блок .popup__price строкой вида {{offer.price}}&#x20bd;/ночь
@@ -69,28 +65,6 @@
 
       // Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
       popup.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
-    },
-
-    // Открыть карточку
-    openPopup: function () {
-      window.util.switchHidden(popup);
-      document.addEventListener('keydown', onPopupEscPress);
-    },
-
-    closePopup: function () {
-      window.util.switchHidden(popup, true);
-      document.removeEventListener('keydown', onPopupEscPress);
     }
   };
-
-  var onPopupEscPress = function (evt) {
-    window.util.isEscEvent(evt, window.card.closePopup);
-    window.util.isEscEvent(evt, window.pin.removeClassActive);
-  };
-
-  // Закрыть карточку
-  var popupClose = popup.querySelector('.popup__close');
-  popupClose.addEventListener('click', function () {
-    window.card.closePopup();
-  });
 })();
