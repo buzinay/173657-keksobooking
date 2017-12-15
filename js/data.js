@@ -6,7 +6,7 @@
   var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var FLAT_TYPE = ['flat', 'house', 'bungalo'];
 
-  var cardTotalNumber = 8;// ??????Где определить?
+  var cardTotalNumber = 8;
   var titles = window.utils.randomArray(CARD_TITLE, cardTotalNumber);
 
   window.data = {

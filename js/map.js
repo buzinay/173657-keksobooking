@@ -18,7 +18,6 @@
 
   var pins = map.querySelectorAll('[data-number]');
   var popup = map.querySelector('.map__card');
-  window.console.log('popup' + popup);
 
   // В момент открытия, страница должна находиться в следующем состоянии: карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
 

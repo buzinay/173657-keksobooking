@@ -20,9 +20,6 @@
     return type;
   };
 
-  // var map = document.querySelector('.map');
-
-  // var popup = document.querySelector('.map__card');
   // Заполняем DOM элемент объявления
   window.card = {
     createPopupFragment: function () {
