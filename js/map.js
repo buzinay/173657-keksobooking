@@ -28,13 +28,14 @@
     closePopup();
   };
 
-  // После того, как на блоке map__pin--main произойдет событие mouseup, форма и карта должны активироваться:
   var mapPinMain = map.querySelector('.map__pin--main');
+
+  // После того, как на блоке map__pin--main произойдет событие mouseup, форма и карта должны активироваться:
   mapPinMain.addEventListener('mouseup', function () {
     map.classList.remove('map--faded'); // У карты убрать класс map--faded
     window.utils.switchHidden(pins);
     // У формы убрать класс notice__form--disabled и сделать все поля формы активными
-    window.form.disabledForm();
+    window.form.disabledForm(false);
   });
 
   // При нажатии на любой из элементов .map__pin ему должен добавляться класс map__pin--active и должен показываться элемент .popup

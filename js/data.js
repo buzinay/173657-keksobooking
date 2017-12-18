@@ -5,6 +5,12 @@
   var CHECK_TIME = ['12:00', '13:00', '14:00'];
   var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var FLAT_TYPE = ['flat', 'house', 'bungalo'];
+  var COORDINATE_RANGE = {
+    minX: 300,
+    maxX: 900,
+    minY: 100,
+    maxY: 500
+  };
 
   var cardTotalNumber = 8;
   var titles = window.utils.randomArray(CARD_TITLE, cardTotalNumber);
@@ -33,12 +39,16 @@
           photos: [] // пустой массив
         };
         cards[i].location = {
-          x: window.utils.getRandomNum(300, 900), // случайное число, координата x метки на карте от 300 до 900,
-          y: window.utils.getRandomNum(100, 500) // случайное число, координата y метки на карте от 100 до 500
+          x: window.utils.getRandomNum(COORDINATE_RANGE.minX, COORDINATE_RANGE.maxX), // случайное число, координата x метки на карте от 300 до 900,
+          y: window.utils.getRandomNum(COORDINATE_RANGE.minY, COORDINATE_RANGE.maxY) // случайное число, координата y метки на карте от 100 до 500
         };
         cards[i].offer.address = cards[i].location.x + ', ' + cards[i].location.y;
       }
       return cards;
+    },
+    getCoordinateRange: function () {
+      var coordinateRange = COORDINATE_RANGE;
+      return coordinateRange;
     }
   };
 })();
