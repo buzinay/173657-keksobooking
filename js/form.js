@@ -44,7 +44,7 @@
   var noticeAddress = noticeForm.querySelector('#address');
   var checkAddressValidity = function (input) {
     if (input.validity.valueMissing || input.value === '') {
-      input.setCustomValidity('Пожалуйста, заполните это поле');
+      input.setCustomValidity('Пожалуйста, выберите местоположение Вашего помещения на карте');
       setErrorStyle(input);
     } else {
       removeErrorStyle(input);
@@ -60,55 +60,48 @@
 
   var noticeTimeIn = noticeForm.querySelector('#timein');
   var noticeTimeOut = noticeForm.querySelector('#timeout');
+  var timeIn = window.data.getCheckTimes();
+  var timeOut = window.data.getCheckTimes();
+
+  var syncValues = function (element, value) {
+    element.value = value;
+  };
 
   noticeTimeIn.addEventListener('change', function () {
-    var index = noticeTimeIn.options.selectedIndex;
-    noticeTimeOut.options[index].selected = true;
+    window.synchronizeFields(noticeTimeIn, noticeTimeOut, timeIn, timeOut, syncValues);
   });
 
   noticeTimeOut.addEventListener('change', function () {
-    var index = noticeTimeOut.options.selectedIndex;
-    noticeTimeIn.options[index].selected = true;
+    window.synchronizeFields(noticeTimeOut, noticeTimeIn, timeOut, timeIn, syncValues);
   });
 
   // Синхронизация минимальной цены в зависимости от типа жилья
 
   var noticeType = noticeForm.querySelector('#type');
   var noticePrice = noticeForm.querySelector('#price');
+  var minPrices = window.data.getFlatMinPrice();
+  var flatTypes = window.data.getFlatType();
 
   // «Лачуга» — минимальная цена 0
   // «Квартира» — минимальная цена 1000
   // «Дом» — минимальная цена 5000
   // «Дворец» — минимальная цена 10000
-  var getMinPrice = function (target) {
-    var minPrice;
-    switch (target) {
-      case 'flat': {
-        minPrice = 1000;
-        break;
-      }
-      case 'house': {
-        minPrice = 5000;
-        break;
-      }
-      case 'palace': {
-        minPrice = 10000;
-        break;
-      }
-      default: {
-        minPrice = 0;
-        break;
-      }
-    }
-    return minPrice;
+
+  var syncValueWithMin = function (element, value) {
+    element.min = value;
   };
 
-  noticeType.addEventListener('change', function (evt) {
-    var target = evt.target;
-    noticePrice.setAttribute('min', getMinPrice(target.value));
+  noticeType.addEventListener('change', function () {
+    window.synchronizeFields(noticeType, noticePrice, flatTypes, minPrices, syncValueWithMin);
   });
 
   var maxPrice = 1000000;
+
+  var getMinPrice = function (value) {
+    var index = flatTypes.indexOf(value);
+    var minPrice = minPrices[index];
+    return minPrice;
+  };
 
   var checkPriceValidity = function (input) {
     var currentMinPrice = getMinPrice(noticeType.value);
@@ -142,46 +135,31 @@
   // 2 комнаты — «для 2-х или 1-го гостя»
   // 3 комнаты — «для 2-х, 1-го или 3-х гостей»
   // 100 комнат — «не для гостей»
-
+  // Синхронизация количество комнат с количеством гостей
   var noticeRoomNumber = noticeForm.querySelector('#room_number');
   var noticeCapacity = noticeForm.querySelector('#capacity');
+  var roomNumbers = window.data.getFlatTotalRoom();
+  var flatCapacities = window.data.getFlatCapacity();
 
-  var setCapacity = function (val) {
-    for (var i = 0; i < noticeCapacity.options.length; i++) {
-      noticeCapacity.options[i].disabled = true;
+  var syncFlatCapacity = function (element, values) {
+    for (var i = 0; i < element.options.length; i++) {
+      element.options[i].disabled = true;
     }
-    switch (val) {
-      case '1': {
-        noticeCapacity.options[2].selected = true;
-        noticeCapacity.options[2].disabled = false;
-        break;
-      }
-      case '2': {
-        noticeCapacity.options[1].selected = true;
-        noticeCapacity.options[1].disabled = false;
-        noticeCapacity.options[2].disabled = false;
-        break;
-      }
-      case '3': {
-        noticeCapacity.options[0].selected = true;
-        noticeCapacity.options[0].disabled = false;
-        noticeCapacity.options[1].disabled = false;
-        noticeCapacity.options[2].disabled = false;
-        break;
-      }
-      default: {
-        noticeCapacity.options[3].selected = true;
-        noticeCapacity.options[3].disabled = false;
-        break;
+    for (i = 0; i < values.length; i++) {
+      for (var j = 0; j < element.options.length; j++) {
+        if (element.options[j].value === values[i]) {
+          element.options[j].disabled = false;
+          element.options[j].selected = true;
+        }
       }
     }
   };
 
-  noticeRoomNumber.addEventListener('change', function (evt) {
-    var target = evt.target;
-    setCapacity(target.value);
+  noticeRoomNumber.addEventListener('change', function () {
+    window.synchronizeFields(noticeRoomNumber, noticeCapacity, roomNumbers, flatCapacities, syncFlatCapacity);
   });
 
+  // Проверка на заполнение обязательных оплей
   var requiredFields = ['title', 'address', 'price'];
   var noticeFormFields = noticeForm.querySelectorAll('input:not([type="submit"])');
 
@@ -207,16 +185,17 @@
     formOnLoad: function () {
       noticeForm.classList.toggle('notice__form--disabled', true);
       for (var i = 0; i < noticeFormFieldsets.length; i++) {
-        noticeFormFieldsets[i].setAttribute('disabled', 'disabled');
+        noticeFormFieldsets[i].disabled = true;
       }
-      setCapacity(noticeRoomNumber.options[noticeRoomNumber.options.selectedIndex].value);
-      noticePrice.setAttribute('min', getMinPrice(noticeType.options[noticeType.options.selectedIndex].value));
+      window.synchronizeFields(noticeRoomNumber, noticeCapacity, roomNumbers, flatCapacities, syncFlatCapacity);
+      window.synchronizeFields(noticeTimeIn, noticeTimeOut, timeIn, timeOut, syncValues);
+      window.synchronizeFields(noticeType, noticePrice, flatTypes, minPrices, syncValueWithMin);
     },
 
     disabledForm: function () {
       noticeForm.classList.remove('notice__form--disabled');
       for (var i = 0; i < noticeFormFieldsets.length; i++) {
-        noticeFormFieldsets[i].removeAttribute('disabled');
+        noticeFormFieldsets[i].disabled = false;
       }
     }
   };
