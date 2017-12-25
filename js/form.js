@@ -176,20 +176,34 @@
     return error;
   };
 
+  var synchronizeNoticeFormFields = function () {
+    window.synchronizeFields(noticeRoomNumber, noticeCapacity, roomNumbers, flatCapacities, syncFlatCapacity);
+    window.synchronizeFields(noticeTimeIn, noticeTimeOut, timeIn, timeOut, syncValues);
+    window.synchronizeFields(noticeType, noticePrice, flatTypes, minPrices, syncValueWithMin);
+  };
+
+  var onSuccess = function () {
+    noticeForm.reset();
+    synchronizeNoticeFormFields();
+    window.backend.onSuccess();
+  };
+
   noticeForm.addEventListener('submit', function (event) {
     if (checkRequiredFields()) {
       event.preventDefault();
+    } else {
+      window.backend.upload(new FormData(noticeForm), onSuccess, window.backend.onError);
+      event.preventDefault();
     }
   });
+
   window.form = {
     formOnLoad: function () {
       noticeForm.classList.toggle('notice__form--disabled', true);
       for (var i = 0; i < noticeFormFieldsets.length; i++) {
         noticeFormFieldsets[i].disabled = true;
       }
-      window.synchronizeFields(noticeRoomNumber, noticeCapacity, roomNumbers, flatCapacities, syncFlatCapacity);
-      window.synchronizeFields(noticeTimeIn, noticeTimeOut, timeIn, timeOut, syncValues);
-      window.synchronizeFields(noticeType, noticePrice, flatTypes, minPrices, syncValueWithMin);
+      synchronizeNoticeFormFields();
     },
 
     disabledForm: function () {

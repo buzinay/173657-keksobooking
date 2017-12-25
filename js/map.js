@@ -4,19 +4,21 @@
   var map = document.querySelector('.map');
   var mapPin = document.querySelector('.map__pins');
 
-  var cards = window.data.generateCards();
+
+  var cards = [];
+  function onSuccess(data) {
+    cards = data;
+    var fragment = window.pin.generateFragmentWithPins(cards);
+    mapPin.appendChild(fragment);
+  }
 
   // Вставляем фрагмент со сгенерированными пинами в разметку
-  var fragment = window.pin.generateFragmentWithPins(cards);
-  mapPin.appendChild(fragment);
-  fragment = window.card.createPopupFragment();
+
+  var fragment = window.card.createPopupFragment();
   // Находим нужное место в разметке и вставляем фрагмент для карточки объявления
   var mapFiltersContainer = document.querySelector('.map__filters-container');
   map.insertBefore(fragment, mapFiltersContainer);
 
-  map.classList.remove('map--faded');
-
-  var pins = map.querySelectorAll('[data-number]');
   var popup = map.querySelector('.map__card');
 
   // В момент открытия, страница должна находиться в следующем состоянии: карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
@@ -24,7 +26,6 @@
   window.onload = function () {
     map.classList.toggle('map--faded', true);
     window.form.formOnLoad();
-    window.utils.switchHidden(pins, true);
     closePopup();
   };
 
@@ -32,10 +33,13 @@
 
   // После того, как на блоке map__pin--main произойдет событие mouseup, форма и карта должны активироваться:
   mapPinMain.addEventListener('mouseup', function () {
-    map.classList.remove('map--faded'); // У карты убрать класс map--faded
-    window.utils.switchHidden(pins);
-    // У формы убрать класс notice__form--disabled и сделать все поля формы активными
-    window.form.disabledForm(false);
+    // У карты убрать класс map--faded
+    if (map.classList.contains('map--faded')) {
+      map.classList.remove('map--faded');
+      // У формы убрать класс notice__form--disabled и сделать все поля формы активными
+      window.form.disabledForm(false);
+      window.backend.load(onSuccess, window.backend.onError);
+    }
   });
 
   // При нажатии на любой из элементов .map__pin ему должен добавляться класс map__pin--active и должен показываться элемент .popup
