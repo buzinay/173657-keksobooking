@@ -25,6 +25,21 @@
 
     return xhr;
   };
+  var getMessageWindow = function (message) {
+    var messageWindow = document.createElement('div');
+    messageWindow.style.cssText = 'z-index: 100; margin: 0 auto; padding: 50px 35px; text-align: center; background-color: white; border-radius: 5px; box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);';
+    messageWindow.style.position = 'fixed';
+    messageWindow.style.left = '50%';
+    messageWindow.style.top = '20%';
+    messageWindow.style.transform = 'translateX(-50%)';
+    messageWindow.style.width = '500px';
+    messageWindow.style.height = '200px';
+    messageWindow.style.fontSize = '24px';
+    messageWindow.textContent = message;
+    return messageWindow;
+  };
+
+  var successMessage = 'Данные отправлены успешно!';
 
   window.backend = {
     load: function (onLoad, onError) {
@@ -42,19 +57,18 @@
     },
 
     onError: function (errorMessage) {
-      var onErrorMessage = document.createElement('div');
-      onErrorMessage.style.cssText = 'z-index: 100; margin: 0 auto; padding: 35px 35px; text-align: center; color: red; background-color: white; box-shadow: 0 2px 0 3px rgba(0, 0, 0, 0.2);';
-      onErrorMessage.style.position = 'absolute';
-      onErrorMessage.style.left = 0;
-      onErrorMessage.style.right = 0;
-      onErrorMessage.style.width = '300px';
-      onErrorMessage.style.height = '100px';
-      onErrorMessage.style.fontSize = '24px';
-
-      onErrorMessage.textContent = errorMessage;
+      var onErrorMessage = getMessageWindow(errorMessage);
       document.body.insertAdjacentElement('afterbegin', onErrorMessage);
       setTimeout(function () {
         onErrorMessage.parentNode.removeChild(onErrorMessage);
+      }, 5000);
+    },
+
+    onSuccess: function () {
+      var onSuccessMessage = getMessageWindow(successMessage);
+      document.body.insertAdjacentElement('afterbegin', onSuccessMessage);
+      setTimeout(function () {
+        onSuccessMessage.parentNode.removeChild(onSuccessMessage);
       }, 5000);
     }
   };

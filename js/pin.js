@@ -2,7 +2,7 @@
 
 // Создание пинов
 (function () {
-  var cardTotalNumber = 5;
+  var cardTotalNumber = 8;
 
   // var cards = window.data.generateCards();
 

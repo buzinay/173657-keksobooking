@@ -182,17 +182,17 @@
     window.synchronizeFields(noticeType, noticePrice, flatTypes, minPrices, syncValueWithMin);
   };
 
-  var successHandler = function () {
+  var onSuccess = function () {
     noticeForm.reset();
     synchronizeNoticeFormFields();
-    window.console.log('Данные отправлены успешно');
+    window.backend.onSuccess();
   };
 
   noticeForm.addEventListener('submit', function (event) {
     if (checkRequiredFields()) {
       event.preventDefault();
     } else {
-      window.backend.upload(new FormData(noticeForm), successHandler, window.backend.onError);
+      window.backend.upload(new FormData(noticeForm), onSuccess, window.backend.onError);
       event.preventDefault();
     }
   });
