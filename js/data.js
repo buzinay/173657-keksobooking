@@ -1,9 +1,9 @@
 'use strict';
 
 (function () {
-  var CARD_TITLE = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
+//  var CARD_TITLE = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
   var CHECK_TIME = ['12:00', '13:00', '14:00'];
-  var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+  //  var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var FLAT_TYPE = ['flat', 'house', 'palace', 'bungalo'];
   var FLAT_MIN_PRICE = ['1000', '5000', '10000', '0'];
   var FLAT_TOTAL_ROOM = ['1', '2', '3', '100'];
@@ -14,17 +14,17 @@
     minY: 100,
     maxY: 500
   };
-
-  var cardTotalNumber = 8;
-  var titles = window.utils.randomArray(CARD_TITLE, cardTotalNumber);
+  var cardTotalNumber = 5;
+  // var titles = window.utils.randomArray(CARD_TITLE, cardTotalNumber);
 
   window.data = {
-    generateCards: function () {
+    generateCards: function (data) {
       // Генерируем карточки объявлений
       var cards = [];
       for (var i = 0; i < cardTotalNumber; i++) {
-        cards[i] = {};
-        cards[i].author = {
+        cards[i] = data[i];
+      }
+      /* cards[i].author = {
           avatar: 'img/avatars/user0' + (i + 1) + '.png',
         }; // строка, адрес изображения вида img/avatars/user{{xx}}.png, где xx это число от 1 до 8
 
@@ -46,7 +46,8 @@
           y: window.utils.getRandomNum(COORDINATE_RANGE.minY, COORDINATE_RANGE.maxY) // случайное число, координата y метки на карте от 100 до 500
         };
         cards[i].offer.address = cards[i].location.x + ', ' + cards[i].location.y;
-      }
+      }*/
+      window.console.log(cards);
       return cards;
     },
     getCoordinateRange: function () {

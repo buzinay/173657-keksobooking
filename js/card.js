@@ -60,6 +60,20 @@
       // В соответствующий блок выведите описание объекта недвижимости offer.description
       popup.querySelectorAll('p')[4].textContent = card.offer.description;
 
+      /*  var pictureList = popup.querySelector('.popup__pictures');
+      while (pictureList.firstChild) {
+        pictureList.removeChild(pictureList.firstChild);
+      }
+
+      for (i = 0; i < card.offer.photos.length; i++) {
+        var photoListItem = document.createElement('li');
+        var photoItem = document.createElement('img');
+        photoItem.setAttribute('src', card.offer.photos[i]);
+        photoItem.style.width = '25%';
+        photoListItem.appendChild(photoItem);
+        pictureList.appendChild(photoListItem);
+      }*/
+
       // Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
       popup.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
     }
