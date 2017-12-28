@@ -12,12 +12,12 @@
     minY: 100,
     maxY: 500
   };
-  var cardTotalNumber = 8;
 
   window.data = {
     generateCards: function (data) {
       // Генерируем карточки объявлений
       var cards = [];
+      var cardTotalNumber = window.map.cards.length >= 5 ? 5 : window.map.cards.length;
       for (var i = 0; i < cardTotalNumber; i++) {
         cards[i] = data[i];
       }

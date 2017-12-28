@@ -64,7 +64,7 @@
       while (pictureList.firstChild) {
         pictureList.removeChild(pictureList.firstChild);
       }
-      // var photoWidth = (card.offer.photos.length) ? 210 / card.offer.photos.length : 0;
+
       var generatePhotoListItem = function (photo) {
         var photoListItem = document.createElement('li');
         var photoItem = document.createElement('img');

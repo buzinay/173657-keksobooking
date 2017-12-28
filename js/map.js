@@ -52,7 +52,7 @@
       if (target.classList.contains('map__pin') && !target.classList.contains('map__pin--main')) {
         target.classList.add('map__pin--active');
         var activePinNumber = target.getAttribute('data-number');
-        window.card.renderCard(cards[activePinNumber], popup);
+        window.card.renderCard(window.filter.getFilteredData(cards)[activePinNumber], popup);
         openPopup();
         return;
       }
@@ -81,4 +81,17 @@
   popupClose.addEventListener('click', function () {
     closePopup();
   });
+
+  // фильтрация данных
+  var filterForm = document.querySelector('.map__filters');
+
+  var onFilterChange = function () {
+    window.pin.removePins();
+    closePopup();
+    fragment = window.pin.generateFragmentWithPins(window.filter.getFilteredData(cards));
+    mapPin.appendChild(fragment);
+  };
+
+  filterForm.removeEventListener('change', onFilterChange);
+  filterForm.addEventListener('change', onFilterChange);
 })();
