@@ -2,9 +2,10 @@
 
 // Создание пинов
 (function () {
+  var MAX_CARD_TOTAL = 5;
   window.pin = {
     generateFragmentWithPins: function (cards) {
-      var cardTotalNumber = cards.length >= 5 ? 5 : cards.length;
+      var cardTotalNumber = cards.length >= MAX_CARD_TOTAL ? MAX_CARD_TOTAL : cards.length;
       // Создает фрагмент кода с метками объявлений
       var fragment = document.createDocumentFragment();
       for (var i = 0; i < cardTotalNumber; i++) {

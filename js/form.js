@@ -12,6 +12,7 @@
   var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
   var minTitle = 30;
   var maxTitle = 100;
+  var maxPrice = 1000000;
 
   noticeTitle.addEventListener('invalid', function (evt) {
     checkNoticeTitle(evt.target);
@@ -97,8 +98,6 @@
     window.synchronizeFields(noticeType, noticePrice, flatTypes, minPrices, syncValueWithMin);
   });
 
-  var maxPrice = 1000000;
-
   var getMinPrice = function (value) {
     var index = flatTypes.indexOf(value);
     var minPrice = minPrices[index];
@@ -181,17 +180,22 @@
     window.synchronizeFields(noticeType, noticePrice, flatTypes, minPrices, syncValueWithMin);
   };
 
-  var onSuccess = function () {
+  var onReset = function () {
+    window.mainPin.moveToDefaultPlace();
     noticeForm.reset();
+  };
+
+  var onSuccess = function () {
+    onReset();
     synchronizeNoticeFormFields();
   };
 
-  noticeForm.addEventListener('submit', function (event) {
+  noticeForm.addEventListener('submit', function (evt) {
     if (checkRequiredFields()) {
-      event.preventDefault();
+      evt.preventDefault();
     } else {
       window.backend.upload(new FormData(noticeForm), onSuccess, window.backend.onError);
-      event.preventDefault();
+      evt.preventDefault();
     }
   });
 

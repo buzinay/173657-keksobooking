@@ -11,6 +11,12 @@
 
   var mapPinMain = document.querySelector('.map__pin--main');
   var addressField = document.querySelector('#address');
+  var defaultCoordinate = {
+    x: mapPinMain.offsetLeft,
+    y: mapPinMain.offsetTop
+  };
+  window.console.log(defaultCoordinate);
+
   var addressCoordinate = {};
 
   var mapPinMainOffsetX = mapPinMain.offsetWidth / 2;
@@ -82,4 +88,11 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
+
+  window.mainPin = {
+    moveToDefaultPlace: function () {
+      mapPinMain.style.left = defaultCoordinate.x + 'px';
+      mapPinMain.style.top = defaultCoordinate.y + 'px';
+    }
+  };
 })();

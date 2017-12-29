@@ -2,6 +2,9 @@
 
 // фильтрация данных
 (function () {
+  var MIN_FILTER_PRICE = 10000;
+  var MAX_FILTER_PRICE = 50000;
+
   var filterForm = document.querySelector('.map__filters');
   var housingType = filterForm.querySelector('#housing-type');
   var housingPrice = filterForm.querySelector('#housing-price');
@@ -17,15 +20,15 @@
     var rangePrice;
     switch (housingPrice.value) {
       case 'low': {
-        rangePrice = data.offer.price < 10000;
+        rangePrice = data.offer.price < MIN_FILTER_PRICE;
         break;
       }
       case 'middle': {
-        rangePrice = data.offer.price >= 10000 && data.offer.price < 50000;
+        rangePrice = data.offer.price >= MIN_FILTER_PRICE && data.offer.price < MAX_FILTER_PRICE;
         break;
       }
       case 'high': {
-        rangePrice = data.offer.price >= 50000;
+        rangePrice = data.offer.price >= MAX_FILTER_PRICE;
         break;
       }
       default: {
