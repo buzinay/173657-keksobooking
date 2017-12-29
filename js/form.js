@@ -1,6 +1,12 @@
 'use strict';
 
 (function () {
+  var CHECK_TIME = ['12:00', '13:00', '14:00'];
+  var FLAT_TYPE = ['flat', 'house', 'palace', 'bungalo'];
+  var FLAT_MIN_PRICE = ['1000', '5000', '10000', '0'];
+  var FLAT_TOTAL_ROOM = ['1', '2', '3', '100'];
+  var FLAT_CAPACITY = [['1'], ['1', '2'], ['1', '2', '3'], ['0']];
+
   var noticeForm = document.querySelector('.notice__form');
   var noticeTitle = noticeForm.querySelector('#title');
   var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
@@ -8,13 +14,11 @@
   var maxTitle = 100;
 
   noticeTitle.addEventListener('invalid', function (evt) {
-    var target = evt.target;
-    checkNoticeTitle(target);
+    checkNoticeTitle(evt.target);
   });
 
   noticeTitle.addEventListener('keydown', function (evt) {
-    var target = evt.target;
-    checkNoticeTitle(target);
+    checkNoticeTitle(evt.target);
   });
 
   var checkNoticeTitle = function (input) {
@@ -52,15 +56,14 @@
   };
 
   noticeAddress.addEventListener('invalid', function (evt) {
-    var target = evt.target;
-    checkAddressValidity(target);
+    checkAddressValidity(evt.target);
   });
 
   // Синхронизация время выезда со временем въезда
   var noticeTimeIn = noticeForm.querySelector('#timein');
   var noticeTimeOut = noticeForm.querySelector('#timeout');
-  var timeIn = window.data.getCheckTimes();
-  var timeOut = window.data.getCheckTimes();
+  var timeIn = CHECK_TIME;
+  var timeOut = CHECK_TIME;
 
   var syncValues = function (element, value) {
     element.value = value;
@@ -78,8 +81,8 @@
 
   var noticeType = noticeForm.querySelector('#type');
   var noticePrice = noticeForm.querySelector('#price');
-  var minPrices = window.data.getFlatMinPrice();
-  var flatTypes = window.data.getFlatType();
+  var minPrices = FLAT_MIN_PRICE;
+  var flatTypes = FLAT_TYPE;
 
   // «Лачуга» — минимальная цена 0
   // «Квартира» — минимальная цена 1000
@@ -119,13 +122,11 @@
   };
 
   noticePrice.addEventListener('invalid', function (evt) {
-    var target = evt.target;
-    checkPriceValidity(target);
+    checkPriceValidity(evt.target);
   });
 
   noticePrice.addEventListener('change', function (evt) {
-    var target = evt.target;
-    checkPriceValidity(target);
+    checkPriceValidity(evt.target);
   });
 
   // Количество комнат связано с количеством гостей:
@@ -136,8 +137,8 @@
   // Синхронизация количество комнат с количеством гостей
   var noticeRoomNumber = noticeForm.querySelector('#room_number');
   var noticeCapacity = noticeForm.querySelector('#capacity');
-  var roomNumbers = window.data.getFlatTotalRoom();
-  var flatCapacities = window.data.getFlatCapacity();
+  var roomNumbers = FLAT_TOTAL_ROOM;
+  var flatCapacities = FLAT_CAPACITY;
 
   var syncFlatCapacity = function (element, values) {
     for (var i = 0; i < element.options.length; i++) {

@@ -4,12 +4,11 @@
   window.utils = {
     // Функция для выбора случайного числа в диапазоне от min до max
     getRandomNum: function (min, max) {
-      var randomNum = Math.round(Math.random() * (max - min)) + min;
-      return randomNum;
+      return Math.round(Math.random() * (max - min)) + min;
     },
 
     //  Функция возвращает неповторяющийся случайный подмассив из элементов массива array длиной length
-    randomArray: function (array, length) {
+    getRandomArray: function (array, length) {
       var nonRepeatingRandomNumbers = [];
       var nonRepeatingArray = [];
       var i = 0;

@@ -84,6 +84,6 @@
 
       // Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
       popup.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
-    }
+    },
   };
 })();

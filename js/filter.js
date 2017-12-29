@@ -35,12 +35,16 @@
     return rangePrice;
   };
 
+  var getNeededElem = function (field, dataElem) {
+    return field.value === 'any' ? true : field.value === (dataElem).toString();
+  };
+
   var getHousingRangeRooms = function (data) {
-    return housingRooms.value === 'any' ? true : housingRooms.value === (data.offer.rooms).toString();
+    return getNeededElem(housingRooms, data.offer.rooms);
   };
 
   var getHousingRangeGuests = function (data) {
-    return housingGuests.value === 'any' ? true : housingGuests.value === (data.offer.guests).toString();
+    return getNeededElem(housingGuests, data.offer.guests);
   };
 
   var getHousingRangeOffers = function (data) {
@@ -65,8 +69,6 @@
           .filter(getHousingRangePrice)
           .filter(getHousingRangeRooms)
           .filter(getHousingRangeGuests)
-          .filter(getHousingRangeOffers)
-          .filter(getHousingRangeOffers)
           .filter(getHousingRangeOffers);
       return filteredData;
     }

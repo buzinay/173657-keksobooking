@@ -12,7 +12,6 @@
   }
 
   // Вставляем фрагмент со сгенерированными пинами в разметку
-
   var fragment = window.card.createPopupFragment();
   // Находим нужное место в разметке и вставляем фрагмент для карточки объявления
   var mapFiltersContainer = document.querySelector('.map__filters-container');
@@ -22,7 +21,6 @@
 
   // В момент открытия, страница должна находиться в следующем состоянии:
   // карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
-
   window.onload = function () {
     map.classList.toggle('map--faded', true);
     window.form.formOnLoad();
@@ -44,7 +42,6 @@
 
   // При нажатии на любой из элементов .map__pin ему должен добавляться класс map__pin--active и должен показываться элемент .popup
   // Если до этого у другого элемента существовал класс pin--active, то у этого элемента класс нужно убрать
-
   map.addEventListener('click', function (evt) {
     var target = evt.target;
     window.pin.removeClassActive();
