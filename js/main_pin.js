@@ -15,7 +15,6 @@
     x: mapPinMain.offsetLeft,
     y: mapPinMain.offsetTop
   };
-  window.console.log(defaultCoordinate);
 
   var addressCoordinate = {};
 
