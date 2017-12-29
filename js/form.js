@@ -6,13 +6,13 @@
   var FLAT_MIN_PRICE = ['1000', '5000', '10000', '0'];
   var FLAT_TOTAL_ROOM = ['1', '2', '3', '100'];
   var FLAT_CAPACITY = [['1'], ['1', '2'], ['1', '2', '3'], ['0']];
+  var MIN_TITLE_LENGTH = 30;
+  var MAX_TITLE_LENGTH = 100;
+  var MAX_PRICE = 1000000;
 
   var noticeForm = document.querySelector('.notice__form');
   var noticeTitle = noticeForm.querySelector('#title');
   var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
-  var minTitle = 30;
-  var maxTitle = 100;
-  var maxPrice = 1000000;
 
   noticeTitle.addEventListener('invalid', function (evt) {
     checkNoticeTitle(evt.target);
@@ -26,10 +26,10 @@
     if (input.validity.valueMissing || input.value === '') {
       input.setCustomValidity('Пожалуйста, заполните это поле');
       setErrorStyle(input);
-    } else if (input.validity.tooLong || input.length > maxTitle) {
+    } else if (input.validity.tooLong || input.length > MAX_TITLE_LENGTH) {
       input.setCustomValidity('Заголовок не должен превышать 100 символов');
       setErrorStyle(input);
-    } else if (input.validity.tooShort || input.value.length < minTitle) {
+    } else if (input.validity.tooShort || input.value.length < MIN_TITLE_LENGTH) {
       input.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
       setErrorStyle(input);
     } else {
@@ -112,7 +112,7 @@
     } else if (input.validity.rangeUnderflow || input.value < currentMinPrice) {
       input.setCustomValidity('Минимальныя цена должна быть не ниже ' + currentMinPrice);
       setErrorStyle(input);
-    } else if (input.validity.rangeOverflow || input.value > maxPrice) {
+    } else if (input.validity.rangeOverflow || input.value > MAX_PRICE) {
       input.setCustomValidity('Максимальная цена должна быть ниже 1000000 ');
       setErrorStyle(input);
     } else {
