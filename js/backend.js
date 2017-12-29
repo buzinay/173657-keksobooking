@@ -39,8 +39,6 @@
     return messageWindow;
   };
 
-  var successMessage = 'Данные отправлены успешно!';
-
   window.backend = {
     load: function (onLoad, onError) {
       var xhr = getXhrResult(onLoad, onError);
@@ -59,16 +57,8 @@
     onError: function (errorMessage) {
       var onErrorMessage = getMessageWindow(errorMessage);
       document.body.insertAdjacentElement('afterbegin', onErrorMessage);
-      setTimeout(function () {
+      window.setTimeout(function () {
         onErrorMessage.parentNode.removeChild(onErrorMessage);
-      }, 5000);
-    },
-
-    onSuccess: function () {
-      var onSuccessMessage = getMessageWindow(successMessage);
-      document.body.insertAdjacentElement('afterbegin', onSuccessMessage);
-      setTimeout(function () {
-        onSuccessMessage.parentNode.removeChild(onSuccessMessage);
       }, 5000);
     }
   };

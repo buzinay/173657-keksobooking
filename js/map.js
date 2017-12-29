@@ -4,7 +4,6 @@
   var map = document.querySelector('.map');
   var mapPin = document.querySelector('.map__pins');
 
-
   var cards = [];
   function onSuccess(data) {
     cards = data;
@@ -21,7 +20,8 @@
 
   var popup = map.querySelector('.map__card');
 
-  // В момент открытия, страница должна находиться в следующем состоянии: карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
+  // В момент открытия, страница должна находиться в следующем состоянии:
+  // карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
 
   window.onload = function () {
     map.classList.toggle('map--faded', true);
@@ -92,6 +92,6 @@
     mapPin.appendChild(fragment);
   };
 
-  filterForm.removeEventListener('change', onFilterChange);
+  filterForm.removeEventListener('change', window.debounce(onFilterChange));
   filterForm.addEventListener('change', onFilterChange);
 })();

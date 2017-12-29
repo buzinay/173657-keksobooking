@@ -38,20 +38,24 @@
       var mapPinMainTop = mapPinMain.offsetTop - shift.y;
       var mapPinMainLeft = mapPinMain.offsetLeft - shift.x;
 
-      if (mapPinMainTop < minY) {
-        mapPinMainTop = minY;
+      if (mapPinMainTop <= minY) {
+        mapPinMainTop = (minY);
+        document.removeEventListener('mousemove', onMouseMove);
       }
 
-      if (mapPinMainTop > maxY) {
+      if (mapPinMainTop >= maxY) {
         mapPinMainTop = maxY;
+        document.removeEventListener('mousemove', onMouseMove);
       }
 
       if (mapPinMainLeft < minX) {
         mapPinMainLeft = minX;
+        document.removeEventListener('mousemove', onMouseMove);
       }
 
       if (mapPinMainLeft > maxX) {
         mapPinMainLeft = maxX;
+        document.removeEventListener('mousemove', onMouseMove);
       }
 
       mapPinMain.style.top = mapPinMainTop + 'px';

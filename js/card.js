@@ -74,6 +74,7 @@
         photoListItem.appendChild(photoItem);
         return photoListItem;
       };
+
       var fragment = document.createDocumentFragment();
       for (i = 0; i < card.offer.photos.length; i++) {
         fragment.appendChild(generatePhotoListItem(card.offer.photos[i]));

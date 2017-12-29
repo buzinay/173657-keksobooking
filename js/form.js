@@ -57,7 +57,6 @@
   });
 
   // Синхронизация время выезда со временем въезда
-
   var noticeTimeIn = noticeForm.querySelector('#timein');
   var noticeTimeOut = noticeForm.querySelector('#timeout');
   var timeIn = window.data.getCheckTimes();
@@ -129,7 +128,6 @@
     checkPriceValidity(target);
   });
 
-
   // Количество комнат связано с количеством гостей:
   // 1 комната — «для одного гостя»
   // 2 комнаты — «для 2-х или 1-го гостя»
@@ -185,7 +183,6 @@
   var onSuccess = function () {
     noticeForm.reset();
     synchronizeNoticeFormFields();
-    window.backend.onSuccess();
   };
 
   noticeForm.addEventListener('submit', function (event) {

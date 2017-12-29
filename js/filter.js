@@ -9,7 +9,6 @@
   var housingGuests = filterForm.querySelector('#housing-guests');
   var housingFeatureList = filterForm.querySelector('#housing-features');
 
-
   var getHousingRangeType = function (data) {
     return housingType.value === 'any' ? true : housingType.value === data.offer.type;
   };
@@ -46,7 +45,6 @@
 
   var getHousingRangeOffers = function (data) {
     var housingFeatures = housingFeatureList.querySelectorAll('input[type=checkbox]:checked');
-    // window.console.dir(housingFeatures, 1);
     var inOffer = true;
     if (housingFeatures.length === 0) {
       inOffer = true;
@@ -60,7 +58,6 @@
     return inOffer;
   };
 
-
   window.filter = {
     getFilteredData: function (data) {
       var filteredData = [];
@@ -71,7 +68,6 @@
           .filter(getHousingRangeOffers)
           .filter(getHousingRangeOffers)
           .filter(getHousingRangeOffers);
-      // window.console.log(filteredData);
       return filteredData;
     }
   };
