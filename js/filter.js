@@ -68,11 +68,7 @@
   window.filter = {
     getFilteredData: function (data) {
       var filteredData = [];
-      filteredData = data.filter(getHousingRangeType)
-          .filter(getHousingRangePrice)
-          .filter(getHousingRangeRooms)
-          .filter(getHousingRangeGuests)
-          .filter(getHousingRangeOffers);
+      filteredData = data.filter(getHousingRangeType).filter(getHousingRangePrice).filter(getHousingRangeRooms).filter(getHousingRangeGuests).filter(getHousingRangeOffers);
       return filteredData;
     }
   };

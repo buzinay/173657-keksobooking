@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-
   var getType = function (card) {
     var type = '';
     switch (card.offer.type) {
