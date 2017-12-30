@@ -4,7 +4,6 @@
   var map = document.querySelector('.map');
   var mapPin = document.querySelector('.map__pins');
 
-
   var cards = [];
   function onSuccess(data) {
     cards = data;
@@ -13,7 +12,6 @@
   }
 
   // Вставляем фрагмент со сгенерированными пинами в разметку
-
   var fragment = window.card.createPopupFragment();
   // Находим нужное место в разметке и вставляем фрагмент для карточки объявления
   var mapFiltersContainer = document.querySelector('.map__filters-container');
@@ -21,8 +19,8 @@
 
   var popup = map.querySelector('.map__card');
 
-  // В момент открытия, страница должна находиться в следующем состоянии: карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
-
+  // В момент открытия, страница должна находиться в следующем состоянии:
+  // карта затемнена (добавлен класс map--faded) и форма неактивна (добавлен класс notice__form--disabled и все поля формы недоступны, disabled)
   window.onload = function () {
     map.classList.toggle('map--faded', true);
     window.form.formOnLoad();
@@ -44,7 +42,6 @@
 
   // При нажатии на любой из элементов .map__pin ему должен добавляться класс map__pin--active и должен показываться элемент .popup
   // Если до этого у другого элемента существовал класс pin--active, то у этого элемента класс нужно убрать
-
   map.addEventListener('click', function (evt) {
     var target = evt.target;
     window.pin.removeClassActive();
@@ -52,7 +49,7 @@
       if (target.classList.contains('map__pin') && !target.classList.contains('map__pin--main')) {
         target.classList.add('map__pin--active');
         var activePinNumber = target.getAttribute('data-number');
-        window.card.renderCard(cards[activePinNumber], popup);
+        window.card.renderCard(window.filter.getFilteredData(cards)[activePinNumber], popup);
         openPopup();
         return;
       }
@@ -81,4 +78,17 @@
   popupClose.addEventListener('click', function () {
     closePopup();
   });
+
+  // фильтрация данных
+  var filterForm = document.querySelector('.map__filters');
+
+  var onFilterChange = function () {
+    window.pin.removePins();
+    closePopup();
+    fragment = window.pin.generateFragmentWithPins(window.filter.getFilteredData(cards));
+    mapPin.appendChild(fragment);
+  };
+
+  filterForm.removeEventListener('change', window.debounce(onFilterChange));
+  filterForm.addEventListener('change', onFilterChange);
 })();

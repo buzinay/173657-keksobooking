@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-
   var getType = function (card) {
     var type = '';
     switch (card.offer.type) {
@@ -64,7 +63,7 @@
       while (pictureList.firstChild) {
         pictureList.removeChild(pictureList.firstChild);
       }
-      // var photoWidth = (card.offer.photos.length) ? 210 / card.offer.photos.length : 0;
+
       var generatePhotoListItem = function (photo) {
         var photoListItem = document.createElement('li');
         var photoItem = document.createElement('img');
@@ -74,6 +73,7 @@
         photoListItem.appendChild(photoItem);
         return photoListItem;
       };
+
       var fragment = document.createDocumentFragment();
       for (i = 0; i < card.offer.photos.length; i++) {
         fragment.appendChild(generatePhotoListItem(card.offer.photos[i]));
@@ -83,6 +83,6 @@
 
       // Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
       popup.querySelector('.popup__avatar').setAttribute('src', card.author.avatar);
-    }
+    },
   };
 })();

@@ -2,12 +2,10 @@
 
 // Создание пинов
 (function () {
-  var cardTotalNumber = 8;
-
-  // var cards = window.data.generateCards();
-
+  var MAX_CARD_TOTAL = 5;
   window.pin = {
     generateFragmentWithPins: function (cards) {
+      var cardTotalNumber = cards.length >= MAX_CARD_TOTAL ? MAX_CARD_TOTAL : cards.length;
       // Создает фрагмент кода с метками объявлений
       var fragment = document.createDocumentFragment();
       for (var i = 0; i < cardTotalNumber; i++) {
@@ -34,6 +32,13 @@
       if (activePin) {
         activePin.classList.remove('map__pin--active');
       }
+    },
+
+    removePins: function () {
+      var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+      pins.forEach(function (elem) {
+        elem.remove();
+      });
     }
   };
 })();

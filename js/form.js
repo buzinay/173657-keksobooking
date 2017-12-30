@@ -1,30 +1,35 @@
 'use strict';
 
 (function () {
+  var CHECK_TIME = ['12:00', '13:00', '14:00'];
+  var FLAT_TYPE = ['flat', 'house', 'palace', 'bungalo'];
+  var FLAT_MIN_PRICE = ['1000', '5000', '10000', '0'];
+  var FLAT_TOTAL_ROOM = ['1', '2', '3', '100'];
+  var FLAT_CAPACITY = [['1'], ['1', '2'], ['1', '2', '3'], ['0']];
+  var MIN_TITLE_LENGTH = 30;
+  var MAX_TITLE_LENGTH = 100;
+  var MAX_PRICE = 1000000;
+
   var noticeForm = document.querySelector('.notice__form');
   var noticeTitle = noticeForm.querySelector('#title');
   var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
-  var minTitle = 30;
-  var maxTitle = 100;
 
   noticeTitle.addEventListener('invalid', function (evt) {
-    var target = evt.target;
-    checkNoticeTitle(target);
+    checkNoticeTitle(evt.target);
   });
 
   noticeTitle.addEventListener('keydown', function (evt) {
-    var target = evt.target;
-    checkNoticeTitle(target);
+    checkNoticeTitle(evt.target);
   });
 
   var checkNoticeTitle = function (input) {
     if (input.validity.valueMissing || input.value === '') {
       input.setCustomValidity('Пожалуйста, заполните это поле');
       setErrorStyle(input);
-    } else if (input.validity.tooLong || input.length > maxTitle) {
+    } else if (input.validity.tooLong || input.length > MAX_TITLE_LENGTH) {
       input.setCustomValidity('Заголовок не должен превышать 100 символов');
       setErrorStyle(input);
-    } else if (input.validity.tooShort || input.value.length < minTitle) {
+    } else if (input.validity.tooShort || input.value.length < MIN_TITLE_LENGTH) {
       input.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
       setErrorStyle(input);
     } else {
@@ -52,16 +57,14 @@
   };
 
   noticeAddress.addEventListener('invalid', function (evt) {
-    var target = evt.target;
-    checkAddressValidity(target);
+    checkAddressValidity(evt.target);
   });
 
   // Синхронизация время выезда со временем въезда
-
   var noticeTimeIn = noticeForm.querySelector('#timein');
   var noticeTimeOut = noticeForm.querySelector('#timeout');
-  var timeIn = window.data.getCheckTimes();
-  var timeOut = window.data.getCheckTimes();
+  var timeIn = CHECK_TIME;
+  var timeOut = CHECK_TIME;
 
   var syncValues = function (element, value) {
     element.value = value;
@@ -79,8 +82,8 @@
 
   var noticeType = noticeForm.querySelector('#type');
   var noticePrice = noticeForm.querySelector('#price');
-  var minPrices = window.data.getFlatMinPrice();
-  var flatTypes = window.data.getFlatType();
+  var minPrices = FLAT_MIN_PRICE;
+  var flatTypes = FLAT_TYPE;
 
   // «Лачуга» — минимальная цена 0
   // «Квартира» — минимальная цена 1000
@@ -94,8 +97,6 @@
   noticeType.addEventListener('change', function () {
     window.synchronizeFields(noticeType, noticePrice, flatTypes, minPrices, syncValueWithMin);
   });
-
-  var maxPrice = 1000000;
 
   var getMinPrice = function (value) {
     var index = flatTypes.indexOf(value);
@@ -111,7 +112,7 @@
     } else if (input.validity.rangeUnderflow || input.value < currentMinPrice) {
       input.setCustomValidity('Минимальныя цена должна быть не ниже ' + currentMinPrice);
       setErrorStyle(input);
-    } else if (input.validity.rangeOverflow || input.value > maxPrice) {
+    } else if (input.validity.rangeOverflow || input.value > MAX_PRICE) {
       input.setCustomValidity('Максимальная цена должна быть ниже 1000000 ');
       setErrorStyle(input);
     } else {
@@ -120,15 +121,12 @@
   };
 
   noticePrice.addEventListener('invalid', function (evt) {
-    var target = evt.target;
-    checkPriceValidity(target);
+    checkPriceValidity(evt.target);
   });
 
   noticePrice.addEventListener('change', function (evt) {
-    var target = evt.target;
-    checkPriceValidity(target);
+    checkPriceValidity(evt.target);
   });
-
 
   // Количество комнат связано с количеством гостей:
   // 1 комната — «для одного гостя»
@@ -138,8 +136,8 @@
   // Синхронизация количество комнат с количеством гостей
   var noticeRoomNumber = noticeForm.querySelector('#room_number');
   var noticeCapacity = noticeForm.querySelector('#capacity');
-  var roomNumbers = window.data.getFlatTotalRoom();
-  var flatCapacities = window.data.getFlatCapacity();
+  var roomNumbers = FLAT_TOTAL_ROOM;
+  var flatCapacities = FLAT_CAPACITY;
 
   var syncFlatCapacity = function (element, values) {
     for (var i = 0; i < element.options.length; i++) {
@@ -182,18 +180,22 @@
     window.synchronizeFields(noticeType, noticePrice, flatTypes, minPrices, syncValueWithMin);
   };
 
-  var onSuccess = function () {
+  var onReset = function () {
+    window.mainPin.moveToDefaultPlace();
     noticeForm.reset();
-    synchronizeNoticeFormFields();
-    window.backend.onSuccess();
   };
 
-  noticeForm.addEventListener('submit', function (event) {
+  var onSuccess = function () {
+    onReset();
+    synchronizeNoticeFormFields();
+  };
+
+  noticeForm.addEventListener('submit', function (evt) {
     if (checkRequiredFields()) {
-      event.preventDefault();
+      evt.preventDefault();
     } else {
       window.backend.upload(new FormData(noticeForm), onSuccess, window.backend.onError);
-      event.preventDefault();
+      evt.preventDefault();
     }
   });
 

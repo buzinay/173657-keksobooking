@@ -2,13 +2,16 @@
 
 (function () {
   var URL = 'https://js.dump.academy/keksobooking';
+  var SUCCESS_STATUS = 200;
+  var TIMEOUT_INTERVAL = 5000;
+  var LOAD_TIMEOUT_INTERVAL = 10000;
 
   var getXhrResult = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === SUCCESS_STATUS) {
         onLoad(xhr.response);
       } else {
         onError('Неизвестный статус: ' + xhr.status + ' ' + xhr.statusText);
@@ -21,7 +24,7 @@
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
 
-    xhr.timeout = 10000; // 10s
+    xhr.timeout = LOAD_TIMEOUT_INTERVAL; // 10s
 
     return xhr;
   };
@@ -38,8 +41,6 @@
     messageWindow.textContent = message;
     return messageWindow;
   };
-
-  var successMessage = 'Данные отправлены успешно!';
 
   window.backend = {
     load: function (onLoad, onError) {
@@ -59,17 +60,9 @@
     onError: function (errorMessage) {
       var onErrorMessage = getMessageWindow(errorMessage);
       document.body.insertAdjacentElement('afterbegin', onErrorMessage);
-      setTimeout(function () {
+      window.setTimeout(function () {
         onErrorMessage.parentNode.removeChild(onErrorMessage);
-      }, 5000);
-    },
-
-    onSuccess: function () {
-      var onSuccessMessage = getMessageWindow(successMessage);
-      document.body.insertAdjacentElement('afterbegin', onSuccessMessage);
-      setTimeout(function () {
-        onSuccessMessage.parentNode.removeChild(onSuccessMessage);
-      }, 5000);
+      }, TIMEOUT_INTERVAL);
     }
   };
 })();
