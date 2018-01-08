@@ -41,8 +41,9 @@
       popup.querySelector('h4').textContent = getType(card);
       var offerRoom = card.offer.rooms === 1 ? ' комната' : ' комнаты';
       var offerQuests = card.offer.guests === 1 ? ' гостя' : ' гостей';
-      popup.querySelectorAll('p')[2].textContent = card.offer.rooms + offerRoom + ' для ' + card.offer.guests + offerQuests; // Выведите количество гостей и комнат offer.rooms и offer.guests в соответствующий блок строкой вида {{offer.rooms}} для {{offer.guests}} гостей
-      popup.querySelectorAll('p')[3].textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout; // Время заезда и выезда offer.checkin и offer.checkout в соответствующий блок строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}
+      var popupStrings = popup.querySelectorAll('p');
+      popupStrings[2].textContent = card.offer.rooms + offerRoom + ' для ' + card.offer.guests + offerQuests; // Выведите количество гостей и комнат offer.rooms и offer.guests в соответствующий блок строкой вида {{offer.rooms}} для {{offer.guests}} гостей
+      popupStrings[3].textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout; // Время заезда и выезда offer.checkin и offer.checkout в соответствующий блок строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}
 
       // В список .popup__features выведите все доступные удобства в квартире из массива {{offer.features}} пустыми элементами списка (<li>) с классом feature feature--{{название удобства}}
       var featureList = popup.querySelector('.popup__features');
@@ -57,7 +58,7 @@
       }
 
       // В соответствующий блок выведите описание объекта недвижимости offer.description
-      popup.querySelectorAll('p')[4].textContent = card.offer.description;
+      popupStrings[4].textContent = card.offer.description;
 
       var pictureList = popup.querySelector('.popup__pictures');
       while (pictureList.firstChild) {
