@@ -9,6 +9,7 @@
   var MIN_TITLE_LENGTH = 30;
   var MAX_TITLE_LENGTH = 100;
   var MAX_PRICE = 1000000;
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 
   var noticeForm = document.querySelector('.notice__form');
   var noticeTitle = noticeForm.querySelector('#title');
@@ -157,20 +158,17 @@
     window.synchronizeFields(noticeRoomNumber, noticeCapacity, roomNumbers, flatCapacities, syncFlatCapacity);
   });
 
-  // Проверка на заполнение обязательных оплей
+  // Проверка на заполнение обязательных полей
   var requiredFields = ['title', 'address', 'price'];
-  var noticeFormFields = noticeForm.querySelectorAll('input:not([type="submit"])');
-
   var checkRequiredFields = function () {
     var error = false;
-    for (var i = 0; i < requiredFields.length; i++) {
-      for (var j = 0; j < noticeFormFields.length; j++) {
-        if (noticeFormFields[j].name === requiredFields[i] && noticeFormFields[j].value === '') {
-          setErrorStyle(noticeFormFields[j]);
-          error = true;
-        }
+    requiredFields.forEach(function (fieldName) {
+      var noticeFormRequiredField = noticeForm.querySelector('input[name=' + fieldName + ']');
+      if (noticeFormRequiredField.value === '') {
+        setErrorStyle(noticeFormRequiredField);
+        error = true;
       }
-    }
+    });
     return error;
   };
 
@@ -199,20 +197,62 @@
     }
   });
 
+  // загрузка фотографий и аватарки пользователя
+  var noticeFormAvatarChooser = noticeForm.querySelector('#avatar');
+  var noticeFormAvatarPreviewer = noticeForm.querySelector('.notice__preview img');
+
+  noticeFormAvatarChooser.addEventListener('change', function () {
+    var file = noticeFormAvatarChooser.files[0];
+    var fileName = file.name.toLowerCase();
+    var matches = FILE_TYPES.some(function (type) {
+      return fileName.endsWith(type);
+    });
+    if (matches) {
+      var reader = new FileReader();
+      reader.addEventListener('load', function () {
+        noticeFormAvatarPreviewer.src = reader.result;
+      });
+      reader.readAsDataURL(file);
+    }
+  });
+
+  var noticeFormImagesChooser = noticeForm.querySelector('#images');
+  var noticeFormPhoto = noticeForm.querySelector('.form__photo-container');
+
+  noticeFormImagesChooser.addEventListener('change', function () {
+    var file = noticeFormImagesChooser.files[0];
+    var fileName = file.name.toLowerCase();
+    var matches = FILE_TYPES.some(function (type) {
+      return fileName.endsWith(type);
+    });
+    if (matches) {
+      var reader = new FileReader();
+      reader.addEventListener('load', function () {
+        var noticeImage = document.createElement('img');
+        noticeImage.src = reader.result;
+        noticeImage.width = '140';
+        noticeImage.alt = 'Фотография помещения';
+        noticeImage.style.cssText = 'margin: 5px 0 0; border-radius: 5px;';
+        noticeFormPhoto.appendChild(noticeImage);
+      });
+      reader.readAsDataURL(file);
+    }
+  });
+
   window.form = {
     formOnLoad: function () {
       noticeForm.classList.toggle('notice__form--disabled', true);
-      for (var i = 0; i < noticeFormFieldsets.length; i++) {
-        noticeFormFieldsets[i].disabled = true;
-      }
+      Array.prototype.forEach.call(noticeFormFieldsets, function (formFieldset) {
+        formFieldset.disabled = true;
+      });
       synchronizeNoticeFormFields();
     },
 
     disabledForm: function () {
       noticeForm.classList.remove('notice__form--disabled');
-      for (var i = 0; i < noticeFormFieldsets.length; i++) {
-        noticeFormFieldsets[i].disabled = false;
-      }
+      Array.prototype.forEach.call(noticeFormFieldsets, function (formFieldset) {
+        formFieldset.disabled = false;
+      });
     }
   };
 })();
