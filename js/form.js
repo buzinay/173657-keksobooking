@@ -242,16 +242,16 @@
   window.form = {
     formOnLoad: function () {
       noticeForm.classList.toggle('notice__form--disabled', true);
-      Array.from(noticeFormFieldsets).forEach(function (noticeFormFieldset) {
-        noticeFormFieldset.disabled = true;
+      Array.prototype.forEach.call(noticeFormFieldsets, function (formFieldset) {
+        formFieldset.disabled = true;
       });
       synchronizeNoticeFormFields();
     },
 
     disabledForm: function () {
       noticeForm.classList.remove('notice__form--disabled');
-      Array.from(noticeFormFieldsets).forEach(function (noticeFormFieldset) {
-        noticeFormFieldset.disabled = false;
+      Array.prototype.forEach.call(noticeFormFieldsets, function (formFieldset) {
+        formFieldset.disabled = false;
       });
     }
   };
