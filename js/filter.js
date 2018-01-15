@@ -65,10 +65,14 @@
     return inOffer;
   };
 
+  var filterData = function (data) {
+    return getHousingRangeType(data) && getHousingRangePrice(data) && getHousingRangeRooms(data) && getHousingRangeGuests(data) && getHousingRangeOffers(data);
+  };
+
   window.filter = {
     getFilteredData: function (data) {
       var filteredData = [];
-      filteredData = data.filter(getHousingRangeType).filter(getHousingRangePrice).filter(getHousingRangeRooms).filter(getHousingRangeGuests).filter(getHousingRangeOffers);
+      filteredData = data.filter(filterData);
       return filteredData;
     }
   };

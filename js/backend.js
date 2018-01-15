@@ -2,6 +2,7 @@
 
 (function () {
   var URL = 'https://js.dump.academy/keksobooking';
+  var URL_DATA = 'data.json';
   var SUCCESS_STATUS = 200;
   var TIMEOUT_INTERVAL = 5000;
   var LOAD_TIMEOUT_INTERVAL = 10000;
@@ -46,7 +47,7 @@
     load: function (onLoad, onError) {
       var xhr = getXhrResult(onLoad, onError);
 
-      xhr.open('GET', URL + '/data');
+      xhr.open('GET', URL_DATA);
       xhr.send();
     },
 
